@@ -43,7 +43,7 @@ export function CommandDialog({
           className
         )}
       >
-        <header className="sticky top-0 z-10 flex items-start gap-3 border-b bg-card/95 px-5 py-4 backdrop-blur">
+        <header className="sticky top-0 z-10 flex items-start gap-3 border-b bg-card/95 px-4 py-3 backdrop-blur">
           {icon && (
             <span
               aria-hidden
@@ -72,7 +72,7 @@ export function CommandDialog({
                 size="icon-sm"
                 aria-label="Close"
                 title="Close"
-                className="hidden shrink-0 rounded-(--radius-lg) text-muted-foreground hover:text-foreground sm:inline-flex"
+                className="shrink-0 rounded-(--radius-lg) text-muted-foreground hover:text-foreground"
               >
                 <HugeiconsIcon icon={Cancel01Icon} size={14} />
               </Button>
@@ -81,12 +81,12 @@ export function CommandDialog({
         </header>
 
         <ScrollArea className="min-h-0 flex-1">
-          <div className="px-5 py-4">{children}</div>
+          <div className="px-4 py-3">{children}</div>
         </ScrollArea>
 
         <footer
           className={cn(
-            "sticky bottom-0 z-10 flex flex-wrap items-center justify-end gap-2 border-t bg-card/95 px-5 py-3 backdrop-blur",
+            "sticky bottom-0 z-10 flex flex-wrap items-center justify-end gap-2 border-t bg-card/95 px-4 py-2.5 backdrop-blur",
             !footer && "sm:hidden"
           )}
         >
@@ -96,12 +96,10 @@ export function CommandDialog({
               <Button
                 type="button"
                 variant="ghost"
-                size="icon-sm"
-                aria-label="Close"
-                title="Close"
-                className="shrink-0 rounded-(--radius-lg) text-muted-foreground hover:text-foreground sm:hidden"
+                className="order-last shrink-0 text-muted-foreground hover:text-foreground sm:hidden"
               >
                 <HugeiconsIcon icon={Cancel01Icon} size={14} />
+                Close
               </Button>
             }
           />

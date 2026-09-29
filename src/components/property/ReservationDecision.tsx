@@ -1,5 +1,11 @@
 "use client"
 
+import {
+  ArrowTurnBackwardIcon,
+  CancelCircleIcon,
+  CheckmarkCircle02Icon,
+} from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { useActionState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -41,6 +47,12 @@ export function ReservationDecision({
           disabled={isSaving}
           className="text-destructive"
         >
+          <HugeiconsIcon
+            icon={
+              status === "PENDING" ? CancelCircleIcon : ArrowTurnBackwardIcon
+            }
+            size={14}
+          />
           {status === "PENDING" ? "Reject" : "Revoke"}
         </Button>
       )}
@@ -52,6 +64,7 @@ export function ReservationDecision({
           value="approve"
           disabled={isSaving}
         >
+          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} />
           {isSaving
             ? "Saving..."
             : status === "REJECTED"
