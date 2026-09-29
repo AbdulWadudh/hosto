@@ -64,7 +64,7 @@ export function PropertyCard({
   manageHref?: string
 }) {
   return (
-    <Card className="group flex flex-col overflow-hidden p-0">
+    <Card className="group relative flex flex-col overflow-hidden p-0">
       <Link
         href={`/p/${property.slug}`}
         className="relative block aspect-16/10 w-full overflow-hidden bg-muted"

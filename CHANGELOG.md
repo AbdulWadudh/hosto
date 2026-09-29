@@ -60,6 +60,9 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 ### Fixed
 
 - Property photographs show up instead of a broken image.
+- Clicking anywhere on the dashboard no longer opens a property. The card's link was
+  stretching to the whole page rather than to the card, so every patch of empty space
+  was a click target.
 - Dates already past are visibly struck out on the calendar. They looked exactly like
   free ones, so there was no way to tell what you could actually ask for.
 - The night you arrive and the night you leave are drawn as half days, so a stay from
