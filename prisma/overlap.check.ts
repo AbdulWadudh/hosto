@@ -34,6 +34,7 @@ function checkPrivacyProjection() {
     blockedUntil: at("2026-10-15T15:00:00Z"),
     status: "CONFIRMED" as const,
     notes: "Secret note",
+    endedReason: null,
     guestId: "guest-1",
     guest: { name: "Priya", email: "priya@example.com", image: null },
   }

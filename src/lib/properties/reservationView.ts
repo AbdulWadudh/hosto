@@ -7,6 +7,7 @@ export type ReservationRow = {
   blockedUntil: Date
   status: ReservationStatus
   notes: string | null
+  endedReason: string | null
   guestId: string
   guest: { name: string; email: string; image: string | null }
 }
@@ -22,6 +23,7 @@ export type ReservationView =
       isYours: boolean
       reserver: { name: string; email: string; image: string | null }
       notes: string | null
+      endedReason: string | null
     }
   | {
       visibility: "anonymous"
@@ -61,6 +63,7 @@ export function projectReservation(
       isYours: viewer?.id === reservation.guestId,
       reserver: reservation.guest,
       notes: reservation.notes,
+      endedReason: reservation.endedReason,
     }
   }
 
