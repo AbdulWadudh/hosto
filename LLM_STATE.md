@@ -106,6 +106,31 @@ profile alongside `--wait`.
 `bun run dev` runs `docker compose up -d --wait` first, so the dev server never starts
 against a database or object store that is not accepting connections.
 
+### D8 - The auth base URL is derived from the request, not an env var
+
+`BETTER_AUTH_URL` is gone. `baseURL` is a dynamic config with
+`config.auth.allowedHosts`, so localhost, production and any future preview host all work
+from one build.
+
+`allowedHosts` is what makes this safe. Deriving an origin from a bare `Host` header lets
+an attacker point password-reset and OAuth callback links at their own domain. An
+unlisted host is refused outright.
+
+`protocol` is pinned per environment — `https` in production, `http` otherwise — rather
+than `"auto"`. `"auto"` trusts `x-forwarded-proto` only when `trustedProxyHeaders` is on,
+so behind a TLS-terminating proxy it would otherwise build `http://hosto.k79.quest/...`,
+which does not match the `https` redirect URI registered with Google.
+
+Google OAuth redirect URI, which follows `config.auth.basePath`:
+
+```
+http://localhost:3000/api/v1/auth/callback/google
+https://hosto.k79.quest/api/v1/auth/callback/google
+```
+
+Note the `/v1/`. Every guide online shows `/api/auth/callback/google`, the Better Auth
+default. Bumping the API version means updating the Google console in the same breath.
+
 ## Changelog
 
 `CHANGELOG.md` holds the short, user-facing summary in plain language. Long form — why, what

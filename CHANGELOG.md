@@ -19,6 +19,7 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - A landing page, plus the Terms and Privacy pages Google asks for before it will verify sign-in.
 - Postgres and S3-compatible storage that come up with the dev server rather than after it.
 - Database migrations, applied automatically before the server starts.
+- One build now serves localhost and production; the site address is no longer baked in.
 
 ### Changed
 

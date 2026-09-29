@@ -1,4 +1,6 @@
 const apiPrefix = "/api/v1"
+const productionHost = "hosto.k79.quest"
+const developmentHost = "localhost:3000"
 
 export const config = {
   api: {
@@ -7,11 +9,12 @@ export const config = {
   auth: {
     basePath: `${apiPrefix}/auth`,
     minPasswordLength: 8,
+    allowedHosts: [developmentHost, productionHost],
   },
   site: {
     name: "Hosto",
     description: "Keep track of who is staying at your properties, and when.",
-    url: "https://hosto.k79.quest",
+    url: `https://${productionHost}`,
     contact: {
       email: "privacy@k79.quest",
       postal: "K79, Bengaluru, Karnataka, India",
