@@ -50,7 +50,11 @@ export const getPropertyBySlug = cache(
       where: {
         propertyId: property.id,
         ...(maySeeEveryPending
-          ? { status: { in: ["PENDING", "CONFIRMED", "REJECTED"] } }
+          ? {
+              status: {
+                in: ["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"],
+              },
+            }
           : {
               OR: [
                 { status: "CONFIRMED" as const },
@@ -59,7 +63,11 @@ export const getPropertyBySlug = cache(
                       {
                         guestId: viewer.id,
                         status: {
-                          in: ["PENDING" as const, "REJECTED" as const],
+                          in: [
+                            "PENDING" as const,
+                            "REJECTED" as const,
+                            "CANCELLED" as const,
+                          ],
                         },
                       },
                     ]
@@ -75,6 +83,7 @@ export const getPropertyBySlug = cache(
         blockedUntil: true,
         status: true,
         notes: true,
+        endedReason: true,
         guestId: true,
         guest: { select: { name: true, email: true, image: true } },
       },

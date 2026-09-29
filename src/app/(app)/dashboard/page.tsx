@@ -78,7 +78,7 @@ export default async function DashboardPage() {
       prisma.reservation.findMany({
         where: {
           guestId: user.id,
-          status: { in: ["PENDING", "CONFIRMED", "REJECTED"] },
+          status: { in: ["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"] },
         },
         orderBy: { checkIn: "asc" },
         take: 10,
@@ -89,6 +89,7 @@ export default async function DashboardPage() {
           blockedUntil: true,
           status: true,
           notes: true,
+          endedReason: true,
           guestId: true,
           property: { select: { title: true, slug: true } },
           guest: { select: { name: true, email: true, image: true } },
@@ -165,6 +166,7 @@ export default async function DashboardPage() {
                   image: null,
                 },
                 notes: reservation.notes,
+                endedReason: reservation.endedReason,
               }))}
             />
           </Card>

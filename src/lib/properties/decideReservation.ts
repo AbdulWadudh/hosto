@@ -19,6 +19,7 @@ export async function decideReservation(
     where: { id },
     select: {
       blockedUntil: true,
+      status: true,
       property: { select: { ownerId: true, slug: true } },
     },
   })
@@ -28,6 +29,9 @@ export async function decideReservation(
   }
   if (reservation.property.ownerId !== user.id && user.role !== "admin") {
     return { error: "Only the owner can decide this one." }
+  }
+  if (reservation.status === "CANCELLED") {
+    return { error: "The guest cancelled this one. Only they can undo that." }
   }
   if (reservation.blockedUntil <= new Date()) {
     return { error: "Those dates have already passed and cannot be changed." }
