@@ -55,13 +55,7 @@ export function CancelFields({
   )
 }
 
-export function CancelActions({
-  isPendingRequest,
-  onKeep,
-}: {
-  isPendingRequest: boolean
-  onKeep: () => void
-}) {
+export function CancelActions({ onKeep }: { onKeep: () => void }) {
   return (
     <>
       <Button type="button" variant="ghost" onClick={onKeep}>
@@ -75,7 +69,7 @@ export function CancelActions({
         className="text-destructive"
       >
         <HugeiconsIcon icon={DeleteThrowIcon} size={14} />
-        {isPendingRequest ? "Withdraw" : "Cancel booking"}
+        Confirm
       </Button>
     </>
   )

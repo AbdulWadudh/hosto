@@ -48,10 +48,7 @@ export function ReservationDialog({
     canDecide && reservation !== null && reservation.status !== "CANCELLED"
 
   const footer = arming ? (
-    <CancelActions
-      isPendingRequest={isPendingRequest}
-      onKeep={() => setArmedFor(null)}
-    />
+    <CancelActions onKeep={() => setArmedFor(null)} />
   ) : reservation && (canCancel || showDecide) ? (
     <>
       {canCancel && (
@@ -62,7 +59,7 @@ export function ReservationDialog({
           onClick={() => setArmedFor(reservation.id)}
         >
           <HugeiconsIcon icon={DeleteThrowIcon} size={14} />
-          {isPendingRequest ? "Withdraw request" : "Cancel booking"}
+          {isPendingRequest ? "Withdraw" : "Cancel"}
         </Button>
       )}
       {showDecide && (

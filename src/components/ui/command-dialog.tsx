@@ -90,7 +90,7 @@ export function CommandDialog({
             render={
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 className="order-last shrink-0 text-muted-foreground hover:text-foreground"
               >
                 <HugeiconsIcon icon={Cancel01Icon} size={14} />

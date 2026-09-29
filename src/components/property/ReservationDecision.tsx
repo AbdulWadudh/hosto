@@ -65,11 +65,7 @@ export function ReservationDecision({
           disabled={isSaving}
         >
           <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} />
-          {isSaving
-            ? "Saving..."
-            : status === "REJECTED"
-              ? "Approve after all"
-              : "Approve"}
+          {isSaving ? "Saving..." : "Approve"}
         </Button>
       )}
     </form>
