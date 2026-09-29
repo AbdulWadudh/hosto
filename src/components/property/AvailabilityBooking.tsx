@@ -223,7 +223,7 @@ export function AvailabilityBooking({
                 transition={{ type: "spring", stiffness: 260, damping: 30 }}
                 className="overflow-hidden"
               >
-                <div className="space-y-4 pt-4">
+                <div className="space-y-4 pt-4 pb-16 sm:pb-0">
                   <input type="hidden" name="slug" value={slug} />
                   <input
                     type="hidden"
