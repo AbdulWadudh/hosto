@@ -89,12 +89,18 @@ export async function updatePropertySettings(
     Math.abs(latitude) <= 90 &&
     Math.abs(longitude) <= 180
 
+  const imageUrls = form
+    .getAll("imageUrls")
+    .map((value) => String(value))
+    .filter((value) => value.length > 0)
+
   await prisma.property.update({
     where: { id: property.id },
     data: {
       title,
       address,
       description: readText(form, "description"),
+      imageUrls,
       maxGuests,
       turnoverBufferMinutes,
       showReserverIdentity: form.get("showReserverIdentity") === "on",

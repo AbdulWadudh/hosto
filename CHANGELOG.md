@@ -51,6 +51,13 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Every day of a stay carries the name of whoever has it, and clicking a taken day opens
   that reservation. Names appear only where they would appear anywhere else; a property
   that keeps them private stays private on the grid too.
+- Photographs are editable after a place exists: the settings screen gets the same drop
+  zone, reordering and cover marker the add form has.
+- An admin console listing everyone on the installation, every place and every request
+  nobody has answered. Roles change from there rather than from a SQL client.
+- Emails when something happens to your dates: a request tells the owner, a decision
+  tells the guest, a cancellation tells the owner. Optional; with no mail credentials
+  set the app logs what it would have sent and carries on.
 - A landing page, plus the Terms and Privacy pages Google asks for before it will verify sign-in.
 - Postgres and S3-compatible storage that come up with the dev server rather than after it.
 - Database migrations, applied automatically before the server starts.

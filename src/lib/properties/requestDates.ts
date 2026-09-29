@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { config } from "@/config"
+import { requestArrived } from "@/lib/notify"
 import { prisma } from "@/lib/prisma"
 import { requireSession } from "@/lib/session"
 
@@ -34,9 +35,11 @@ export async function requestDates(
     select: {
       id: true,
       slug: true,
+      title: true,
       isBookable: true,
       ownerId: true,
       turnoverBufferMinutes: true,
+      owner: { select: { email: true } },
     },
   })
 
@@ -95,6 +98,20 @@ export async function requestDates(
     })
   } catch (failure) {
     return { error: describeWriteFailure(failure) }
+  }
+
+  if (!isOwner) {
+    await requestArrived(
+      property.owner.email,
+      user.name,
+      {
+        checkIn,
+        checkOut,
+        propertyTitle: property.title,
+        propertySlug: property.slug,
+      },
+      notes || null
+    )
   }
 
   revalidatePath(`/p/${property.slug}`)

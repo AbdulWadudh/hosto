@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { decisionMade } from "@/lib/notify"
 import { prisma } from "@/lib/prisma"
 import { requireSession } from "@/lib/session"
 
@@ -20,7 +21,10 @@ export async function decideReservation(
     select: {
       blockedUntil: true,
       status: true,
-      property: { select: { ownerId: true, slug: true } },
+      checkIn: true,
+      checkOut: true,
+      guest: { select: { email: true } },
+      property: { select: { ownerId: true, slug: true, title: true } },
     },
   })
 
@@ -50,6 +54,13 @@ export async function decideReservation(
         : "Something went wrong saving that. Try again.",
     }
   }
+
+  await decisionMade(reservation.guest.email, approving, {
+    checkIn: reservation.checkIn,
+    checkOut: reservation.checkOut,
+    propertyTitle: reservation.property.title,
+    propertySlug: reservation.property.slug,
+  })
 
   revalidatePath(`/p/${reservation.property.slug}`)
   revalidatePath("/dashboard")

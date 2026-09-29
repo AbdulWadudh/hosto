@@ -65,6 +65,11 @@ Open <http://localhost:3000>.
 The bucket is created by a one-shot `rustfs-bucket` job behind the `bootstrap` Compose
 profile. It is idempotent and runs on every `services:up`.
 
+Its CORS allows any origin, which is fine for a service bound to this machine. A bucket
+reachable from anywhere else must allow only the hosts that serve the app — browsers
+`PUT` straight to storage from a presigned URL, so the bucket, not the app, is what
+decides who may upload.
+
 ## Scripts
 
 | | |
@@ -96,6 +101,12 @@ migration by hand.**
 
 `prisma` and `dotenv` are runtime dependencies rather than devDependencies, because
 `start` shells out to the Prisma CLI and `prisma.config.ts` imports `dotenv`.
+
+**Never rename a migration directory that has already been deployed.** Prisma tracks
+applied migrations by folder name, so a rename reads as a new migration, and the second
+run of the same `CREATE TABLE` fails and blocks every deployment after it with P3009.
+Recovering means renaming the row in `_prisma_migrations` to match, and deleting the
+failed one — the checksums will already agree, because the file never changed.
 
 ## Domain rules worth knowing
 

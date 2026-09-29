@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useActionState, useId, useState } from "react"
 import { GuestStepper } from "@/components/dashboard/GuestStepper"
+import { ImageUploader } from "@/components/dashboard/ImageUploader"
 import { PlacePicker } from "@/components/dashboard/PlacePicker"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -37,6 +38,7 @@ export type PropertySettings = {
   title: string
   address: string
   description: string
+  imageUrls: string[]
   latitude: number | null
   longitude: number | null
   placeId: string | null
@@ -126,6 +128,11 @@ export function PropertySettingsForm({
             rows={3}
             defaultValue={property.description}
           />
+        </div>
+
+        <div className="space-y-2">
+          <p className="font-medium text-sm">Photographs</p>
+          <ImageUploader initial={property.imageUrls} />
         </div>
       </Card>
 
