@@ -84,6 +84,7 @@ decides who may upload.
 | `bun run db:deploy` | Apply pending migrations (what `start` runs) |
 | `bun run db:status` | Show which migrations are applied |
 | `bun run db:check` | Prove the reservation constraints against the live database |
+| `bun run calendar:check` | Prove the night, turnover and ribbon rules, no database needed |
 | `bun run db:studio` | Prisma Studio |
 
 ### Migrations run before the server does
