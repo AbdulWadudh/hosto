@@ -39,6 +39,8 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 
 ### Fixed
 
+- Property photographs show up instead of a broken image.
+
 - Deployments no longer start against a database that was never migrated. On hosts that
   build and serve separately, the migration step was being skipped entirely.
 - A missing setting now stops the deployment and names itself, instead of turning every

@@ -260,6 +260,17 @@ evidence once the page displayed identity when authorised. **A privacy check tha
 against a page which never shows the field is not a privacy check.** The pair now runs
 both ways, and `bun run db:check` asserts the projection directly.
 
+### D16 - The image optimiser refuses private IPs, on purpose
+
+Next 16 blocks optimising an upstream image whose hostname resolves to a private address,
+because a permissive optimiser is an SSRF hole. In development the storage endpoint is
+`localhost:9010`, which resolves to `127.0.0.1`, so every uploaded photograph came back
+400 with `"url" parameter is not allowed` and rendered as a broken image.
+
+`dangerouslyAllowLocalIP` is therefore set only when `NODE_ENV !== "production"`. The
+guard stays on where it matters. `remotePatterns` is derived from `S3_ENDPOINT` rather
+than hardcoded, so pointing at hosted storage needs no config change.
+
 ## Changelog
 
 `CHANGELOG.md` holds the short, user-facing summary in plain language. Long form — why, what
