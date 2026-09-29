@@ -19,6 +19,7 @@ export type ReservationView =
       checkOut: Date
       blockedUntil: Date
       status: ReservationStatus
+      isYours: boolean
       reserver: { name: string; email: string; image: string | null }
       notes: string | null
     }
@@ -29,6 +30,7 @@ export type ReservationView =
       checkOut: Date
       blockedUntil: Date
       status: "RESERVED"
+      isYours: false
     }
 
 export type Viewer = {
@@ -56,6 +58,7 @@ export function projectReservation(
       checkOut: reservation.checkOut,
       blockedUntil: reservation.blockedUntil,
       status: reservation.status,
+      isYours: viewer?.id === reservation.guestId,
       reserver: reservation.guest,
       notes: reservation.notes,
     }
@@ -68,5 +71,6 @@ export function projectReservation(
     checkOut: reservation.checkOut,
     blockedUntil: reservation.blockedUntil,
     status: "RESERVED",
+    isYours: false,
   }
 }

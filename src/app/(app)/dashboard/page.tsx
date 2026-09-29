@@ -155,6 +155,7 @@ export default async function DashboardPage() {
                 checkOut: reservation.checkOut,
                 blockedUntil: reservation.blockedUntil,
                 status: reservation.status,
+                isYours: false,
                 reserver: {
                   name: reservation.property.title,
                   email: reservation.guest.email,

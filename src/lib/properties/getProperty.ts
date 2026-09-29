@@ -26,6 +26,7 @@ export type PropertyDetail = {
   nightlyPrice: string | null
   currency: string
   isOwner: boolean
+  canManage: boolean
   reservations: ReservationView[]
 }
 
@@ -43,14 +44,21 @@ export const getPropertyBySlug = cache(
     }
 
     const isOwner = viewer !== null && viewer.id === property.ownerId
-    const maySeePending = isOwner || (viewer?.isAdmin ?? false)
+    const maySeeEveryPending = isOwner || (viewer?.isAdmin ?? false)
 
     const reservations = await prisma.reservation.findMany({
       where: {
         propertyId: property.id,
-        status: maySeePending
-          ? { in: ["PENDING", "CONFIRMED"] }
-          : { equals: "CONFIRMED" },
+        ...(maySeeEveryPending
+          ? { status: { in: ["PENDING", "CONFIRMED"] } }
+          : {
+              OR: [
+                { status: "CONFIRMED" as const },
+                ...(viewer
+                  ? [{ status: "PENDING" as const, guestId: viewer.id }]
+                  : []),
+              ],
+            }),
       },
       orderBy: { checkIn: "asc" },
       select: {
@@ -83,6 +91,7 @@ export const getPropertyBySlug = cache(
       nightlyPrice: property.nightlyPrice?.toFixed(2) ?? null,
       currency: property.currency.trim(),
       isOwner,
+      canManage: maySeeEveryPending,
       reservations: reservations.map((reservation) =>
         projectReservation(reservation, property, viewer)
       ),

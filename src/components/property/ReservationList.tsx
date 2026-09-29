@@ -2,13 +2,13 @@
 
 import { Calendar03Icon } from "@hugeicons/core-free-icons"
 import { useState } from "react"
+import { ReservationDecision } from "@/components/property/ReservationDecision"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { CommandDialog } from "@/components/ui/command-dialog"
-import { DialogClose } from "@/components/ui/dialog"
-import { dayLabel } from "@/lib/calendar/month"
+import { dayLabel, momentLabel } from "@/lib/calendar/month"
 import type { ReservationView } from "@/lib/properties/reservationView"
+import { cn } from "@/lib/utils"
 
 const initialsOf = (name: string) =>
   name
@@ -19,23 +19,34 @@ const initialsOf = (name: string) =>
     .join("") || "?"
 
 const nameOf = (reservation: ReservationView) =>
-  reservation.visibility === "identified"
-    ? reservation.reserver.name
-    : "Reserved"
+  reservation.isYours
+    ? "You"
+    : reservation.visibility === "identified"
+      ? reservation.reserver.name
+      : "Reserved"
 
 const statusOf = (reservation: ReservationView) =>
   reservation.status === "PENDING"
-    ? "Waiting"
+    ? reservation.isYours
+      ? "Waiting on the owner"
+      : "Waiting"
     : reservation.visibility === "identified"
       ? "Booked"
       : "Reserved"
 
 export function ReservationList({
   reservations,
+  canDecide = false,
+  focusedId = null,
+  onFocus,
 }: {
   reservations: ReservationView[]
+  canDecide?: boolean
+  focusedId?: string | null
+  onFocus?: (id: string) => void
 }) {
-  const [open, setOpen] = useState<ReservationView | null>(null)
+  const [openId, setOpenId] = useState<string | null>(null)
+  const open = reservations.find((one) => one.id === openId) ?? null
 
   if (reservations.length === 0) {
     return (
@@ -47,27 +58,33 @@ export function ReservationList({
 
   return (
     <>
-      <ul className="divide-y">
+      <ul className="-mx-2 divide-y">
         {reservations.map((reservation) => (
           <li key={reservation.id}>
             <button
               type="button"
-              onClick={() => setOpen(reservation)}
-              className="flex w-full items-center gap-3 rounded-(--radius-md) py-3 text-left transition-colors hover:bg-muted/40"
+              onClick={() => {
+                onFocus?.(reservation.id)
+                setOpenId(reservation.id)
+              }}
+              className={cn(
+                "flex w-full items-center gap-3 rounded-(--radius-lg) px-2 py-2 text-left transition-colors hover:bg-muted/40",
+                focusedId === reservation.id && "bg-muted/60"
+              )}
             >
               {reservation.visibility === "identified" ? (
-                <Avatar className="size-8 border">
+                <Avatar className="size-7 border">
                   {reservation.reserver.image && (
                     <AvatarImage src={reservation.reserver.image} alt="" />
                   )}
-                  <AvatarFallback className="bg-primary/15 font-medium text-[0.65rem] text-primary">
+                  <AvatarFallback className="bg-primary/15 font-medium text-[0.6rem] text-primary">
                     {initialsOf(reservation.reserver.name)}
                   </AvatarFallback>
                 </Avatar>
               ) : (
                 <span
                   aria-hidden
-                  className="size-8 shrink-0 rounded-full border border-dashed bg-muted/40"
+                  className="size-7 shrink-0 rounded-full border border-dashed bg-muted/40"
                 />
               )}
 
@@ -86,7 +103,7 @@ export function ReservationList({
                   reservation.status === "PENDING" ? "secondary" : "default"
                 }
               >
-                {statusOf(reservation)}
+                {reservation.status === "PENDING" ? "Waiting" : "Booked"}
               </Badge>
             </button>
           </li>
@@ -97,7 +114,7 @@ export function ReservationList({
         open={open !== null}
         onOpenChange={(next) => {
           if (!next) {
-            setOpen(null)
+            setOpenId(null)
           }
         }}
         icon={Calendar03Icon}
@@ -108,13 +125,12 @@ export function ReservationList({
             : undefined
         }
         footer={
-          <DialogClose
-            render={
-              <Button type="button" variant="outline">
-                Close
-              </Button>
-            }
-          />
+          open && canDecide ? (
+            <ReservationDecision
+              reservationId={open.id}
+              isPendingRequest={open.status === "PENDING"}
+            />
+          ) : undefined
         }
       >
         {open && (
@@ -125,15 +141,15 @@ export function ReservationList({
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Arrives</dt>
-              <dd>{open.checkIn.toLocaleString("en-GB")}</dd>
+              <dd>{momentLabel(open.checkIn)}</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Leaves</dt>
-              <dd>{open.checkOut.toLocaleString("en-GB")}</dd>
+              <dd>{momentLabel(open.checkOut)}</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Held until</dt>
-              <dd>{open.blockedUntil.toLocaleString("en-GB")}</dd>
+              <dd>{momentLabel(open.blockedUntil)}</dd>
             </div>
             {open.visibility === "identified" && (
               <>
