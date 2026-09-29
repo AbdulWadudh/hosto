@@ -83,6 +83,7 @@ export default async function PropertySettingsPage({
             title: property.title,
             address: property.address,
             description: property.description,
+            imageUrls: property.imageUrls,
             latitude: property.latitude,
             longitude: property.longitude,
             placeId: property.placeId,

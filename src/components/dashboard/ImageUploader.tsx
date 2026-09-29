@@ -41,9 +41,25 @@ function putWithProgress(
   })
 }
 
-export function ImageUploader({ name = "imageUrls" }: { name?: string }) {
+const alreadyStored = (urls: string[]): Upload[] =>
+  urls.map((url, index) => ({
+    id: `stored-${index}-${url}`,
+    name: decodeURIComponent(url.split("/").pop() ?? "Photograph"),
+    preview: url,
+    progress: 1,
+    url,
+    error: null,
+  }))
+
+export function ImageUploader({
+  name = "imageUrls",
+  initial = [],
+}: {
+  name?: string
+  initial?: string[]
+}) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const [uploads, setUploads] = useState<Upload[]>([])
+  const [uploads, setUploads] = useState<Upload[]>(() => alreadyStored(initial))
   const [isDragging, setIsDragging] = useState(false)
 
   const update = (id: string, patch: Partial<Upload>) => {
@@ -114,7 +130,7 @@ export function ImageUploader({ name = "imageUrls" }: { name?: string }) {
   const remove = (id: string) => {
     setUploads((current) => {
       const target = current.find((item) => item.id === id)
-      if (target) {
+      if (target?.preview.startsWith("blob:")) {
         URL.revokeObjectURL(target.preview)
       }
       return current.filter((item) => item.id !== id)
