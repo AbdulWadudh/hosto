@@ -37,6 +37,17 @@ been deleted for that reason — a second copy is a copy that goes stale.
 to the Prisma CLI and `prisma.config.ts` imports `dotenv`, so a production install that
 skips devDependencies would fail at boot.
 
+Bun auto-loading `.env` does **not** make `dotenv` redundant here, which is worth knowing
+before someone deletes it again. Bun loads `.env` into its own `process.env`, but the
+Prisma CLI runs as a separate Node process and does not inherit it. Removing
+`import "dotenv/config"` from `prisma.config.ts` fails with
+`PrismaConfigEnvError: Cannot resolve environment variable: DATABASE_URL`, under
+`bun run` as well as `npx`. Tested, not assumed.
+
+`@types/node` is deliberately *not* an explicit dependency: `@types/bun` requires
+`bun-types`, which requires `@types/node`. Bun implements Node's APIs, so its types build
+on them. The transitive copy is what makes better-auth's `node:sqlite` import resolve.
+
 Resetting to a clean history later is still fine: drop `prisma/migrations/`, drop the dev
 volume, and regenerate a single baseline the same way.
 

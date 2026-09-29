@@ -47,6 +47,15 @@ the right moment.
 and `prisma.config.ts` imports `dotenv`. A production install that skips devDependencies
 would fail at boot. Both are runtime dependencies now.
 
+**Dropping `dotenv` on the grounds that Bun loads `.env` by itself.** It does, into its own
+`process.env` — but the Prisma CLI is a separate Node process that does not inherit it.
+Removing the import fails with `Cannot resolve environment variable: DATABASE_URL` under
+`bun run` as well as `npx`.
+
+**Declaring `@types/node` explicitly.** Removed. `@types/bun` requires `bun-types`, which
+requires `@types/node`; Bun implements Node's APIs so its types build on them. The
+transitive copy resolves `node:sqlite` for better-auth's types on its own.
+
 ## Note
 
 The existing development database was baselined with `migrate resolve --applied` rather
