@@ -7,7 +7,6 @@ import Link from "next/link"
 export const landingLinks = [
   { href: "#occupancy", label: "Calendar" },
   { href: "#turnover", label: "Turnover" },
-  { href: "#privacy", label: "Privacy" },
 ]
 
 export function SiteNav({
