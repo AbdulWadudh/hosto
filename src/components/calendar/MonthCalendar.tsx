@@ -37,6 +37,9 @@ function describe(day: DayState): string {
   if (day.inBuffer) {
     return "Turnover"
   }
+  if (day.isPast) {
+    return "Past"
+  }
   if (day.pending) {
     return "Requested"
   }
@@ -48,13 +51,15 @@ export function MonthCalendar({
   initialYear,
   initialMonth,
   selection,
-  onSelectDay,
+  onDayDown,
+  onDayEnter,
 }: {
   spans: Span[]
   initialYear: number
   initialMonth: number
   selection?: Selection
-  onSelectDay?: (date: Date) => void
+  onDayDown?: (date: Date) => void
+  onDayEnter?: (date: Date) => void
 }) {
   const [cursor, setCursor] = useState({
     year: initialYear,
@@ -84,6 +89,8 @@ export function MonthCalendar({
     const end = selection.to ?? selection.from
     return date >= selection.from && date <= end
   }
+
+  const sameDay = (a: Date, b: Date) => a.getTime() === b.getTime()
 
   return (
     <div>
@@ -129,21 +136,39 @@ export function MonthCalendar({
         initial={reduced ? false : { opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18 }}
-        className="grid grid-cols-7 gap-1"
+        className="grid select-none grid-cols-7 gap-1"
       >
         {days.map((day) => {
           const split = day.isDeparture && day.inBuffer
           const label = describe(day)
           const picked = inRange(day.date)
-          const canPick =
-            Boolean(onSelectDay) && isSelectable(day) && day.inMonth
+          const isArrivalEdge =
+            picked &&
+            selection?.from !== undefined &&
+            selection?.from !== null &&
+            selection?.to != null &&
+            sameDay(day.date, selection.from)
+          const isDepartureEdge =
+            picked && selection?.to != null && sameDay(day.date, selection.to)
+          const canPick = Boolean(onDayDown) && isSelectable(day)
           const title = `${dayLabel(day.date)} - ${label}`
 
           const surface = cn(
             "relative aspect-square w-full overflow-hidden rounded-(--radius-sm) border text-[0.65rem] transition-colors",
-            day.inMonth ? "border-border/60" : "border-transparent opacity-35",
+            day.inMonth && "border-border/60",
+            !day.inMonth &&
+              (canPick
+                ? "border-border/30 opacity-70"
+                : "border-transparent opacity-35"),
             picked &&
+              !isArrivalEdge &&
+              !isDepartureEdge &&
               "bg-primary/85 text-primary-foreground ring-2 ring-primary",
+            isArrivalEdge &&
+              "bg-[linear-gradient(135deg,transparent_0_49.4%,var(--color-primary)_50.6%_100%)] ring-2 ring-primary",
+            isDepartureEdge &&
+              !isArrivalEdge &&
+              "bg-[linear-gradient(135deg,var(--color-primary)_0_49.4%,transparent_50.6%_100%)] ring-2 ring-primary",
             !picked &&
               day.occupied &&
               !split &&
@@ -161,8 +186,14 @@ export function MonthCalendar({
             !picked &&
               !day.occupied &&
               !day.inBuffer &&
+              day.isPast &&
+              "bg-[repeating-linear-gradient(135deg,var(--color-muted)_0_3px,transparent_3px_6px)]",
+            !picked &&
+              !day.occupied &&
+              !day.inBuffer &&
               !day.pending &&
-              "bg-muted/25",
+              !day.isPast &&
+              "bg-background",
             canPick && !picked && "hover:border-primary hover:bg-primary/15"
           )
 
@@ -171,7 +202,10 @@ export function MonthCalendar({
               className={cn(
                 "absolute top-0.5 left-1 font-mono",
                 day.isToday && "underline underline-offset-2",
-                day.occupied || split || picked
+                day.isPast && !day.occupied && !day.inBuffer && "opacity-40",
+                (day.occupied || split || picked) &&
+                  !isArrivalEdge &&
+                  !isDepartureEdge
                   ? "text-primary-foreground"
                   : "text-muted-foreground"
               )}
@@ -200,7 +234,13 @@ export function MonthCalendar({
               title={title}
               aria-label={`${dayLabel(day.date)}, ${label}`}
               aria-pressed={picked}
-              onClick={() => onSelectDay?.(day.date)}
+              onPointerDown={() => onDayDown?.(day.date)}
+              onPointerEnter={() => onDayEnter?.(day.date)}
+              onClick={(event) => {
+                if (event.detail === 0) {
+                  onDayDown?.(day.date)
+                }
+              }}
               className={surface}
             >
               {splitOverlay}
@@ -212,6 +252,10 @@ export function MonthCalendar({
 
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-[0.6rem] text-muted-foreground">
         <span className="flex items-center gap-1.5">
+          <span className="size-2 rounded-[3px] border border-border bg-background" />
+          Free
+        </span>
+        <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-primary" />
           Booked
         </span>
@@ -222,6 +266,10 @@ export function MonthCalendar({
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full border border-primary/40 border-dashed bg-primary/10" />
           Requested
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="size-2 rounded-[3px] bg-[repeating-linear-gradient(135deg,var(--color-muted-foreground)_0_2px,transparent_2px_4px)]" />
+          Past
         </span>
       </div>
     </div>

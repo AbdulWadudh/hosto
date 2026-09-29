@@ -25,7 +25,11 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Address search on the map, so guests can get directions to the door.
 - A page for every property that anyone can open, with a month calendar showing which
   nights are taken, which are turnover, and which have been asked for.
-- Asking for dates: pick an arrival and a departure and send it to the owner.
+- Asking for dates on the calendar itself: click or drag across the nights you want.
+  Click inside a chosen range to shorten it, and a floating chip shows the range with
+  a way to clear it.
+- Owners edit the name, address, description and how many the place sleeps, and can
+  type a capacity rather than only stepping to it.
 - A settings screen per property, including whether it is taking requests at all.
 - A landing page, plus the Terms and Privacy pages Google asks for before it will verify sign-in.
 - Postgres and S3-compatible storage that come up with the dev server rather than after it.
@@ -40,6 +44,11 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 ### Fixed
 
 - Property photographs show up instead of a broken image.
+- Dates already past are visibly struck out on the calendar. They looked exactly like
+  free ones, so there was no way to tell what you could actually ask for.
+- The night you arrive and the night you leave are drawn as half days, so a stay from
+  the third to the fourth reads as the one night it is rather than two whole days.
+- A range can no longer be drawn straight through nights that are already taken.
 
 - Deployments no longer start against a database that was never migrated. On hosts that
   build and serve separately, the migration step was being skipped entirely.

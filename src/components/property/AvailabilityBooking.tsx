@@ -1,7 +1,9 @@
 "use client"
 
+import { Cancel01Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { useActionState, useState } from "react"
+import { useActionState, useEffect, useRef, useState } from "react"
 import { MonthCalendar, type Selection } from "@/components/calendar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -10,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   dayLabel,
   nightsBetween,
+  rangeHasConflict,
   type Span,
   toDateInput,
 } from "@/lib/calendar/month"
@@ -37,22 +40,71 @@ export function AvailabilityBooking({
     from: null,
     to: null,
   })
+  const [notice, setNotice] = useState<string | null>(null)
   const [state, action, isPending] = useActionState<
     RequestDatesState,
     FormData
   >(requestDates, { error: null })
   const reduced = useReducedMotion()
 
-  const pick = (date: Date) => {
+  const dragging = useRef(false)
+
+  useEffect(() => {
+    const stop = () => {
+      dragging.current = false
+    }
+    window.addEventListener("pointerup", stop)
+    window.addEventListener("pointercancel", stop)
+    return () => {
+      window.removeEventListener("pointerup", stop)
+      window.removeEventListener("pointercancel", stop)
+    }
+  }, [])
+
+  const settle = (from: Date, to: Date): Selection => {
+    if (rangeHasConflict(from, to, spans)) {
+      setNotice("Those nights run through dates that are already taken.")
+      return { from, to: null }
+    }
+    return { from, to }
+  }
+
+  const beginAt = (date: Date) => {
+    dragging.current = true
+    setNotice(null)
     setSelection((current) => {
-      if (!current.from || current.to || date < current.from) {
-        return { from: date, to: null }
+      if (current.from && date > current.from) {
+        return settle(current.from, date)
       }
-      if (date.getTime() === current.from.getTime()) {
+      if (
+        current.from &&
+        !current.to &&
+        date.getTime() === current.from.getTime()
+      ) {
         return { from: null, to: null }
+      }
+      return { from: date, to: null }
+    })
+  }
+
+  const extendTo = (date: Date) => {
+    if (!dragging.current) {
+      return
+    }
+    setSelection((current) => {
+      if (!current.from || date <= current.from) {
+        return current
+      }
+      if (rangeHasConflict(current.from, date, spans)) {
+        return current
       }
       return { from: current.from, to: date }
     })
+  }
+
+  const clear = () => {
+    setNotice(null)
+    setSelection({ from: null, to: null })
   }
 
   const nights =
@@ -67,18 +119,47 @@ export function AvailabilityBooking({
         initialYear={initialYear}
         initialMonth={initialMonth}
         selection={canBook ? selection : undefined}
-        onSelectDay={canBook ? pick : undefined}
+        onDayDown={canBook ? beginAt : undefined}
+        onDayEnter={canBook ? extendTo : undefined}
       />
+
+      {canBook && selection.from && (
+        <div className="pointer-events-none sticky bottom-4 z-20 mt-4 flex justify-center">
+          <motion.div
+            initial={reduced ? false : { y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            className="pointer-events-auto flex items-center gap-2 rounded-(--radius-4xl) border bg-background/90 py-1.5 pr-1.5 pl-3.5 shadow-lg backdrop-blur"
+          >
+            <span className="text-xs">
+              {selection.to
+                ? `${dayLabel(selection.from)} to ${dayLabel(selection.to)} · ${nights} night${nights === 1 ? "" : "s"}`
+                : `${dayLabel(selection.from)} · pick the day you leave`}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              aria-label="Clear selected dates"
+              title="Clear"
+              onClick={clear}
+            >
+              <HugeiconsIcon icon={Cancel01Icon} size={12} />
+            </Button>
+          </motion.div>
+        </div>
+      )}
 
       {canBook && (
         <>
-          <p className="mt-4 border-t pt-4 text-muted-foreground text-xs">
-            {selection.from
-              ? selection.to
-                ? `${dayLabel(selection.from)} to ${dayLabel(selection.to)} - ${nights} night${nights === 1 ? "" : "s"}`
-                : "Now pick the day you leave."
-              : "Pick the day you arrive, then the day you leave."}
-          </p>
+          {notice && (
+            <p
+              role="status"
+              className="mt-4 border-t pt-4 text-destructive text-xs"
+            >
+              {notice}
+            </p>
+          )}
 
           <AnimatePresence initial={false}>
             {selection.from && selection.to && (
@@ -143,7 +224,7 @@ export function AvailabilityBooking({
                     <Button
                       type="button"
                       variant="ghost"
-                      onClick={() => setSelection({ from: null, to: null })}
+                      onClick={clear}
                       className="h-10 px-4"
                     >
                       Clear

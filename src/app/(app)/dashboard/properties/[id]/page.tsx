@@ -76,6 +76,13 @@ export default async function PropertySettingsPage({
           property={{
             id: property.id,
             slug: property.slug,
+            title: property.title,
+            address: property.address,
+            description: property.description,
+            latitude: property.latitude,
+            longitude: property.longitude,
+            placeId: property.placeId,
+            maxGuests: property.maxGuests,
             turnoverBufferMinutes: property.turnoverBufferMinutes,
             showReserverIdentity: property.showReserverIdentity,
             isBookable: property.isBookable,

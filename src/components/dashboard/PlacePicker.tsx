@@ -16,9 +16,13 @@ export type SelectedPlace = {
 
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
-export function PlacePicker() {
+export function PlacePicker({
+  defaultPlace,
+}: {
+  defaultPlace?: SelectedPlace
+} = {}) {
   const host = useRef<HTMLDivElement>(null)
-  const [place, setPlace] = useState<SelectedPlace | null>(null)
+  const [place, setPlace] = useState<SelectedPlace | null>(defaultPlace ?? null)
   const [failed, setFailed] = useState(false)
 
   useEffect(() => {
@@ -82,6 +86,7 @@ export function PlacePicker() {
           name="address"
           required
           placeholder="Coonoor, Tamil Nadu"
+          defaultValue={defaultPlace?.address ?? ""}
         />
         <p className="text-muted-foreground text-xs">
           {failed

@@ -6,6 +6,9 @@ import { requireSession } from "@/lib/session"
 
 export type UpdatePropertyState = { error: string | null; saved: boolean }
 
+const readText = (form: FormData, field: string) =>
+  String(form.get(field) ?? "").trim()
+
 export async function updatePropertySettings(
   _previous: UpdatePropertyState,
   form: FormData
@@ -15,7 +18,7 @@ export async function updatePropertySettings(
 
   const property = await prisma.property.findUnique({
     where: { id },
-    select: { id: true, slug: true, ownerId: true },
+    select: { id: true, slug: true, ownerId: true, address: true },
   })
 
   if (!property) {
@@ -25,6 +28,30 @@ export async function updatePropertySettings(
   const isAdmin = user.role === "admin"
   if (property.ownerId !== user.id && !isAdmin) {
     return { error: "This is not your property.", saved: false }
+  }
+
+  const title = readText(form, "title")
+  if (title.length < 2) {
+    return {
+      error: "Give the place a name of at least two characters.",
+      saved: false,
+    }
+  }
+
+  const address = readText(form, "address") || property.address
+  if (address.length < 4) {
+    return {
+      error: "An address helps you tell two places apart.",
+      saved: false,
+    }
+  }
+
+  const maxGuests = Number(form.get("maxGuests"))
+  if (!Number.isInteger(maxGuests) || maxGuests < 1 || maxGuests > 200) {
+    return {
+      error: "Sleeping capacity must be a whole number from 1 to 200.",
+      saved: false,
+    }
   }
 
   const turnoverBufferMinutes = Number(form.get("turnoverBufferMinutes"))
@@ -40,7 +67,7 @@ export async function updatePropertySettings(
   }
 
   const pricingEnabled = form.get("pricingEnabled") === "on"
-  const nightlyPriceRaw = String(form.get("nightlyPrice") ?? "").trim()
+  const nightlyPriceRaw = readText(form, "nightlyPrice")
   const nightlyPrice = pricingEnabled ? Number(nightlyPriceRaw) : null
 
   if (
@@ -53,14 +80,34 @@ export async function updatePropertySettings(
     }
   }
 
+  const latitude = Number(form.get("latitude"))
+  const longitude = Number(form.get("longitude"))
+  const hasCoordinates =
+    readText(form, "latitude") !== "" &&
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude) &&
+    Math.abs(latitude) <= 90 &&
+    Math.abs(longitude) <= 180
+
   await prisma.property.update({
     where: { id: property.id },
     data: {
+      title,
+      address,
+      description: readText(form, "description"),
+      maxGuests,
       turnoverBufferMinutes,
       showReserverIdentity: form.get("showReserverIdentity") === "on",
       isBookable: form.get("isBookable") === "on",
       pricingEnabled,
       nightlyPrice: nightlyPrice?.toFixed(2) ?? null,
+      ...(hasCoordinates
+        ? {
+            latitude,
+            longitude,
+            placeId: readText(form, "placeId") || null,
+          }
+        : {}),
     },
   })
 

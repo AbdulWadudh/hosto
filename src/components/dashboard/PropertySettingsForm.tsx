@@ -2,6 +2,8 @@
 
 import Link from "next/link"
 import { useActionState, useId, useState } from "react"
+import { GuestStepper } from "@/components/dashboard/GuestStepper"
+import { PlacePicker } from "@/components/dashboard/PlacePicker"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
 import {
   updatePropertySettings,
   type UpdatePropertyState,
@@ -31,6 +34,13 @@ const bufferOptions = [
 export type PropertySettings = {
   id: string
   slug: string
+  title: string
+  address: string
+  description: string
+  latitude: number | null
+  longitude: number | null
+  placeId: string | null
+  maxGuests: number
   turnoverBufferMinutes: number
   showReserverIdentity: boolean
   isBookable: boolean
@@ -83,7 +93,51 @@ export function PropertySettingsForm({
     <form action={action} className="space-y-6">
       <input type="hidden" name="id" value={property.id} />
 
+      <Card className="space-y-5 p-6">
+        <div className="space-y-2">
+          <Label htmlFor="title">Name</Label>
+          <Input
+            id="title"
+            name="title"
+            required
+            defaultValue={property.title}
+          />
+          <p className="text-muted-foreground text-xs">
+            The web address stays as
+            <span className="mx-1 font-mono">/p/{property.slug}</span>
+            so existing links keep working.
+          </p>
+        </div>
+
+        <PlacePicker
+          defaultPlace={{
+            address: property.address,
+            latitude: property.latitude,
+            longitude: property.longitude,
+            placeId: property.placeId,
+          }}
+        />
+
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            rows={3}
+            defaultValue={property.description}
+          />
+        </div>
+      </Card>
+
       <Card className="px-6 py-5">
+        <SettingRow
+          label="Sleeps"
+          hint="Most people who can stay at once. Type a number or use the arrows."
+          control={(labelId) => (
+            <GuestStepper labelId={labelId} defaultValue={property.maxGuests} />
+          )}
+        />
+
         <SettingRow
           label="Taking requests"
           hint="Off keeps the page visible but nobody can ask for dates."

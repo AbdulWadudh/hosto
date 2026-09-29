@@ -271,6 +271,27 @@ because a permissive optimiser is an SSRF hole. In development the storage endpo
 guard stays on where it matters. `remotePatterns` is derived from `S3_ENDPOINT` rather
 than hardcoded, so pointing at hosted storage needs no config change.
 
+### D17 - The calendar is the booking control
+
+There is no separate request form. `beginAt` starts or completes a range, `extendTo`
+widens it while the pointer is down, and a click landing inside an existing range moves
+the departure rather than starting over. Keyboard activation is told apart from pointer
+activation by `event.detail === 0`, so the click handler does not fire twice after
+`pointerdown`.
+
+Drag needs `pointerenter`, which touch devices do not send, so on a phone the interaction
+is tap-arrival then tap-departure. That is deliberate: making drag work on touch means
+`touch-action: none` on the grid, which would break scrolling past the calendar.
+
+Days outside the shown month are still selectable. Disabling them meant that on the last
+day of a month exactly one day could be picked, which is how this was found.
+
+**Arrival and departure are half cells.** A stay from the third to the fourth is one
+night, not two days, and filling both cells solidly said otherwise. Arrival fills from the
+diagonal down, departure up to it — the same language as a turnaround day. Past days carry
+a hatch, and the legend names Free and Past, because an unavailable day previously looked
+identical to a free one.
+
 ## Changelog
 
 `CHANGELOG.md` holds the short, user-facing summary in plain language. Long form — why, what

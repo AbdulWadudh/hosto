@@ -50,6 +50,17 @@ export function dayLabel(date: Date): string {
   return dayFormat.format(date)
 }
 
+export function rangeHasConflict(from: Date, to: Date, spans: Span[]): boolean {
+  const end = addDays(startOfDay(to), 1)
+  const start = startOfDay(from)
+  return spans.some(
+    (span) =>
+      span.status !== "PENDING" &&
+      span.checkIn < end &&
+      span.blockedUntil > start
+  )
+}
+
 export function nightsBetween(from: Date, to: Date): number {
   return Math.max(0, Math.round((to.getTime() - from.getTime()) / dayMs))
 }
