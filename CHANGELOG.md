@@ -75,6 +75,8 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   stated as what it is: four hours after they leave.
 - The day someone leaves is drawn as part of their stay rather than as anonymous
   turnover, so a stay from the third to the fourth marks both days.
+- The floating range chip reads on two lines — the dates on one, the length of the stay
+  on the other — instead of wrapping a single sentence into a shape.
 - A day is only closed by turnover if the turnover is still running when the earliest
   arrival of that day would land. A window that ends at two in the morning was closing
   the whole day behind it.

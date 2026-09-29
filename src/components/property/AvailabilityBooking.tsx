@@ -24,6 +24,7 @@ import {
   type RequestDatesState,
   requestDates,
 } from "@/lib/properties/requestDates"
+import { cn } from "@/lib/utils"
 
 export function AvailabilityBooking({
   slug,
@@ -135,14 +136,11 @@ export function AvailabilityBooking({
     )
   }, [isDayVisit])
 
-  const arrivalLabel = labelForTime(
-    config.booking.arrivalChoices,
-    arrivalTime
-  ).toLowerCase()
+  const arrivalLabel = labelForTime(config.booking.arrivalChoices, arrivalTime)
   const departureLabel = labelForTime(
     config.booking.departureChoices,
     departureTime
-  ).toLowerCase()
+  )
 
   const start =
     selection.from !== null ? atTime(selection.from, arrivalTime) : null
@@ -154,8 +152,22 @@ export function AvailabilityBooking({
       : ""
 
   const stayLabel = isDayVisit
-    ? `no overnight, ${duration}`
-    : `${nights} night${nights === 1 ? "" : "s"}, ${duration}`
+    ? `No overnight · ${duration}`
+    : `${nights} night${nights === 1 ? "" : "s"} · ${duration}`
+
+  const chipHeadline = !selection.from
+    ? ""
+    : !selection.to
+      ? dayLabel(selection.from)
+      : isDayVisit
+        ? `${dayLabel(selection.from)} · ${arrivalLabel} to ${departureLabel}`
+        : `${dayLabel(selection.from)} ${arrivalLabel} to ${dayLabel(selection.to)} ${departureLabel}`
+
+  const chipDetail = !selection.to
+    ? "Pick the day you leave, or tap again for a day visit"
+    : isBackwards
+      ? "Leaving comes before arriving — check the times"
+      : stayLabel
 
   return (
     <Card className="p-5">
@@ -176,17 +188,19 @@ export function AvailabilityBooking({
             initial={reduced ? false : { y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="pointer-events-auto flex items-center gap-2 rounded-(--radius-4xl) border bg-background/90 py-1.5 pr-1.5 pl-3.5 shadow-lg backdrop-blur"
+            className="pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-(--radius-2xl) border bg-background/90 py-2 pr-2 pl-4 shadow-lg backdrop-blur"
           >
-            <span className="text-xs">
-              {selection.to
-                ? isBackwards
-                  ? `${dayLabel(selection.from)} ${arrivalLabel} to ${departureLabel} · check the times`
-                  : isDayVisit
-                    ? `${dayLabel(selection.from)} ${arrivalLabel} to ${departureLabel} · ${stayLabel}`
-                    : `${dayLabel(selection.from)} ${arrivalLabel} to ${dayLabel(selection.to)} ${departureLabel} · ${stayLabel}`
-                : `${dayLabel(selection.from)} · pick the day you leave, or click again for a day visit`}
-            </span>
+            <div className="min-w-0 flex-1 space-y-0.5">
+              <p className="text-xs leading-snug">{chipHeadline}</p>
+              <p
+                className={cn(
+                  "text-[0.7rem] leading-snug",
+                  isBackwards ? "text-destructive" : "text-muted-foreground"
+                )}
+              >
+                {chipDetail}
+              </p>
+            </div>
             <Button
               type="button"
               variant="ghost"
@@ -194,7 +208,7 @@ export function AvailabilityBooking({
               aria-label="Clear selected dates"
               title="Clear"
               onClick={clear}
-              className="rounded-full"
+              className="shrink-0 self-center rounded-(--radius-lg)"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={12} />
             </Button>
