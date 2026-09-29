@@ -14,7 +14,6 @@ import { config } from "@/config"
 import {
   atTime,
   dayLabel,
-  describeDuration,
   nightsBetween,
   rangeHasConflict,
   type Span,
@@ -146,18 +145,10 @@ export function AvailabilityBooking({
     selection.from !== null ? atTime(selection.from, arrivalTime) : null
   const end = selection.to !== null ? atTime(selection.to, departureTime) : null
   const isBackwards = start !== null && end !== null && end <= start
-  const duration =
-    start !== null && end !== null && !isBackwards
-      ? describeDuration(end.getTime() - start.getTime())
-      : ""
-
-  const nightsLabel = isDayVisit
+  const stayLabel = isDayVisit
     ? "No overnight"
     : `${nights} night${nights === 1 ? "" : "s"}`
-  const stayLabel = `${nightsLabel} · ${duration}`
-  const commitLabel = isDayVisit
-    ? `a day visit · ${duration}`
-    : stayLabel.toLowerCase()
+  const commitLabel = isDayVisit ? "a day visit" : stayLabel.toLowerCase()
 
   const chipHeadline = !selection.from
     ? ""

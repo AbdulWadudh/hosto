@@ -15,11 +15,7 @@ import {
 import { ReservationDecision } from "@/components/property/ReservationDecision"
 import { Button } from "@/components/ui/button"
 import { CommandDialog } from "@/components/ui/command-dialog"
-import {
-  dayRangeLabel,
-  describeDuration,
-  momentLabel,
-} from "@/lib/calendar/month"
+import { dayRangeLabel, momentLabel } from "@/lib/calendar/month"
 import {
   type ReservationView,
   reserverName,
@@ -92,12 +88,6 @@ export function ReservationDialog({
     </>
   ) : undefined
 
-  const turnover = reservation
-    ? describeDuration(
-        reservation.blockedUntil.getTime() - reservation.checkOut.getTime()
-      )
-    : ""
-
   return (
     <CommandDialog
       open={reservation !== null}
@@ -127,7 +117,6 @@ export function ReservationDialog({
           <Row term="Status">{reservationStatusLabel(reservation)}</Row>
           <Row term="Arrives">{momentLabel(reservation.checkIn)}</Row>
           <Row term="Leaves">{momentLabel(reservation.checkOut)}</Row>
-          <Row term="Turnover after">{turnover}</Row>
           {reservation.visibility === "identified" && (
             <>
               <Row term="Email">{reservation.reserver.email}</Row>

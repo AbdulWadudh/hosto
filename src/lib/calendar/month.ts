@@ -124,19 +124,6 @@ export function atTime(date: Date, time: string): Date {
   return copy
 }
 
-export function describeDuration(milliseconds: number): string {
-  const totalHours = Math.round(milliseconds / (60 * 60 * 1000))
-  if (totalHours < 24) {
-    return `${totalHours} hour${totalHours === 1 ? "" : "s"}`
-  }
-  const days = Math.floor(totalHours / 24)
-  const hours = totalHours % 24
-  const dayPart = `${days} day${days === 1 ? "" : "s"}`
-  return hours === 0
-    ? dayPart
-    : `${dayPart} ${hours} hour${hours === 1 ? "" : "s"}`
-}
-
 export function coversDay(
   span: { checkIn: Date; checkOut: Date },
   day: Date
