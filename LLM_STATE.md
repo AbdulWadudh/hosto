@@ -121,12 +121,32 @@ than `"auto"`. `"auto"` trusts `x-forwarded-proto` only when `trustedProxyHeader
 so behind a TLS-terminating proxy it would otherwise build `http://hosto.k79.quest/...`,
 which does not match the `https` redirect URI registered with Google.
 
-Google OAuth redirect URI, which follows `config.auth.basePath`:
+The app is served from two production hosts plus Vercel previews:
+
+| Host | Purpose |
+| --- | --- |
+| `localhost:3000` | development |
+| `hosto.k79.quest` | canonical; what `config.site.url` points at |
+| `hosto-k79.vercel.app` | Vercel production alias |
+| `hosto-k79-*.vercel.app` | preview deployments |
+
+The preview entry is deliberately scoped rather than `*.vercel.app`, which would accept a
+`Host` header from anybody's Vercel app. Verified: `other-app.vercel.app` is refused.
+
+`config.site.url` stays on the canonical host so metadata and legal pages do not advertise
+the `vercel.app` alias.
+
+Google OAuth redirect URIs, which follow `config.auth.basePath`:
 
 ```
 http://localhost:3000/api/v1/auth/callback/google
 https://hosto.k79.quest/api/v1/auth/callback/google
+https://hosto-k79.vercel.app/api/v1/auth/callback/google
 ```
+
+Preview deployments get email and password sign-in but **not** Google: their hostnames are
+generated per deployment and cannot be pre-registered. The `oAuthProxy` plugin exists to
+route preview OAuth through a fixed host if that is ever needed.
 
 Note the `/v1/`. Every guide online shows `/api/auth/callback/google`, the Better Auth
 default. Bumping the API version means updating the Google console in the same breath.

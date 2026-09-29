@@ -144,6 +144,7 @@ Register these as **Authorized redirect URIs** on the OAuth client:
 ```
 http://localhost:3000/api/v1/auth/callback/google
 https://hosto.k79.quest/api/v1/auth/callback/google
+https://hosto-k79.vercel.app/api/v1/auth/callback/google
 ```
 
 The `/v1/` is not a typo. Better Auth defaults to `/api/auth`; this app mounts it under
@@ -151,8 +152,12 @@ the versioned prefix, so the value every online guide gives you will fail with
 `redirect_uri_mismatch`.
 
 There is no `BETTER_AUTH_URL`. The origin is derived from the request and checked against
-`config.auth.allowedHosts`, so one build serves localhost and production. Add a host there
-before deploying to it.
+`config.auth.allowedHosts`, so one build serves `localhost`, `hosto.k79.quest`,
+`hosto-k79.vercel.app` and `hosto-k79-*.vercel.app` previews. **Add a host there before
+deploying to it**, or that deployment will refuse to build its own callback URLs.
+
+Preview deployments get email and password sign-in but not Google: their hostnames change
+per deployment, so they cannot be registered as redirect URIs.
 
 ## Legal pages
 
