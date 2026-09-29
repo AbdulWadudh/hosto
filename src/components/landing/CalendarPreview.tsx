@@ -4,13 +4,13 @@ import { motion, useReducedMotion } from "motion/react"
 import { cn } from "@/lib/utils"
 
 const weekdays = [
-  { id: "mon", label: "M" },
-  { id: "tue", label: "T" },
-  { id: "wed", label: "W" },
-  { id: "thu", label: "T" },
-  { id: "fri", label: "F" },
-  { id: "sat", label: "S" },
-  { id: "sun", label: "S" },
+  { id: "mon", label: "Mon" },
+  { id: "tue", label: "Tue" },
+  { id: "wed", label: "Wed" },
+  { id: "thu", label: "Thu" },
+  { id: "fri", label: "Fri" },
+  { id: "sat", label: "Sat" },
+  { id: "sun", label: "Sun" },
 ]
 const leadingBlanks = 2
 const daysInMonth = 31
@@ -75,7 +75,7 @@ export function CalendarPreview({ className }: { className?: string }) {
                 )}
               >
                 {isTurnaround && (
-                  <span className="absolute inset-0 bg-[linear-gradient(135deg,var(--color-muted-foreground)_0_49.4%,transparent_49.4%_50.6%,var(--color-primary)_50.6%_100%)] opacity-55" />
+                  <span className="absolute inset-0 bg-muted-foreground/25" />
                 )}
                 {day > 0 && (
                   <span className="absolute top-1 left-1.5 font-mono text-[0.6rem] text-muted-foreground">
@@ -109,7 +109,7 @@ export function CalendarPreview({ className }: { className?: string }) {
                 "z-10 mb-1.5 flex h-6 items-center self-end truncate rounded-(--radius-2xl) px-2.5 font-medium text-[0.65rem]",
                 ribbon.tone === "named"
                   ? "bg-primary text-primary-foreground"
-                  : "border border-primary/35 bg-primary/15 text-foreground"
+                  : "border border-amber-400/70 border-dashed bg-amber-400/25 text-amber-100"
               )}
             >
               {ribbon.label}
@@ -120,16 +120,16 @@ export function CalendarPreview({ className }: { className?: string }) {
 
       <div className="mt-4 flex items-center gap-4 border-t pt-3 font-mono text-[0.6rem] text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-primary" />
+          <span className="h-2 w-4 rounded-(--radius-2xl) bg-primary" />
           Booked
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-primary/25" />
-          Identity hidden
+          <span className="h-2 w-4 rounded-(--radius-2xl) border border-amber-400/70 border-dashed bg-amber-400/25" />
+          Requested
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2 rotate-45 bg-muted-foreground/60" />
-          Turnaround
+          <span className="size-2 rounded-[3px] bg-muted-foreground/40" />
+          Turnover
         </span>
       </div>
     </div>

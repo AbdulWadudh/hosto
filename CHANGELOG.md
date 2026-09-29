@@ -63,6 +63,10 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Database migrations, applied automatically before the server starts.
 - One build now serves localhost and production; the site address is no longer baked in.
 
+- The calendar on the landing page speaks the product's own vocabulary: Mon to Sun
+  rather than single letters, Turnover rather than Turnaround, and a request drawn the
+  amber way the app draws one instead of a shade of the booked colour.
+
 ### Changed
 
 - Prettier and ESLint are gone. Biome does both jobs.

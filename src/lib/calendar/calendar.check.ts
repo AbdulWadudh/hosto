@@ -102,8 +102,20 @@ function aDayVisitOccupiesItsDay() {
 
 function rejectedAndCancelledHoldNothing() {
   const dead = [
-    stay("gone", "2026-10-25T15:00", "2026-10-27T11:00", "2026-10-27T12:00", "REJECTED"),
-    stay("off", "2026-10-25T15:00", "2026-10-27T11:00", "2026-10-27T12:00", "CANCELLED"),
+    stay(
+      "gone",
+      "2026-10-25T15:00",
+      "2026-10-27T11:00",
+      "2026-10-27T12:00",
+      "REJECTED"
+    ),
+    stay(
+      "off",
+      "2026-10-25T15:00",
+      "2026-10-27T11:00",
+      "2026-10-27T12:00",
+      "CANCELLED"
+    ),
   ]
   const days = buildMonth(2026, 9, dead, null)
   const twentyFifth = days.find(
@@ -146,9 +158,27 @@ function ribbonsSpanAndClip() {
 
 function overlappingRequestsStack() {
   const crowd = [
-    stay("a", "2026-10-05T15:00", "2026-10-08T11:00", "2026-10-08T12:00", "PENDING"),
-    stay("b", "2026-10-06T15:00", "2026-10-09T11:00", "2026-10-09T12:00", "PENDING"),
-    stay("c", "2026-10-07T15:00", "2026-10-08T11:00", "2026-10-08T12:00", "PENDING"),
+    stay(
+      "a",
+      "2026-10-05T15:00",
+      "2026-10-08T11:00",
+      "2026-10-08T12:00",
+      "PENDING"
+    ),
+    stay(
+      "b",
+      "2026-10-06T15:00",
+      "2026-10-09T11:00",
+      "2026-10-09T12:00",
+      "PENDING"
+    ),
+    stay(
+      "c",
+      "2026-10-07T15:00",
+      "2026-10-08T11:00",
+      "2026-10-08T12:00",
+      "PENDING"
+    ),
   ]
   const days = buildMonth(2026, 9, crowd, null)
   const week = days.slice(7, 14)
@@ -211,7 +241,10 @@ function countingAndCovering() {
     3,
     "the fifth to the eighth is three nights"
   )
-  const span = { checkIn: at("2026-10-03T22:00"), checkOut: at("2026-10-05T11:00") }
+  const span = {
+    checkIn: at("2026-10-03T22:00"),
+    checkOut: at("2026-10-05T11:00"),
+  }
   assert.equal(coversDay(span, startOfDay(at("2026-10-03T00:00"))), true)
   assert.equal(coversDay(span, startOfDay(at("2026-10-05T00:00"))), true)
   assert.equal(coversDay(span, startOfDay(at("2026-10-06T00:00"))), false)
