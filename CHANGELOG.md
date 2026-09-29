@@ -35,6 +35,8 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - A settings screen per property, including whether it is taking requests at all.
 - Approve or reject a request from the request itself, and revoke a booking you already
   approved. Only for dates that have not yet passed.
+- Open the property a stay belongs to straight from the stay, so the dashboard is not a
+  dead end.
 - Cancel a booking you made, or withdraw a request still waiting, with a reason for the
   owner if you want to give one. Asks once before it does it, and the dates go straight
   back to everyone else. The owner cannot undo it — it was your decision.

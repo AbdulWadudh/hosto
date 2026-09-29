@@ -1,7 +1,12 @@
 "use client"
 
-import { Calendar03Icon, DeleteThrowIcon } from "@hugeicons/core-free-icons"
+import {
+  ArrowUpRight01Icon,
+  Calendar03Icon,
+  DeleteThrowIcon,
+} from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
+import Link from "next/link"
 import { useState } from "react"
 import {
   CancelActions,
@@ -32,10 +37,12 @@ const isLive = (reservation: ReservationView | null) =>
 export function ReservationDialog({
   reservation,
   canDecide,
+  propertyHref,
   onClose,
 }: {
   reservation: ReservationView | null
   canDecide: boolean
+  propertyHref?: string
   onClose: () => void
 }) {
   const [armedFor, setArmedFor] = useState<string | null>(null)
@@ -49,8 +56,18 @@ export function ReservationDialog({
 
   const footer = arming ? (
     <CancelActions onKeep={() => setArmedFor(null)} />
-  ) : reservation && (canCancel || showDecide) ? (
+  ) : reservation && (canCancel || showDecide || propertyHref) ? (
     <>
+      {propertyHref && (
+        <Button
+          render={<Link href={propertyHref} />}
+          nativeButton={false}
+          variant="outline"
+        >
+          <HugeiconsIcon icon={ArrowUpRight01Icon} size={14} />
+          Open property
+        </Button>
+      )}
       {canCancel && (
         <Button
           type="button"

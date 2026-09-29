@@ -152,6 +152,12 @@ export default async function DashboardPage() {
           <h2 className="font-medium text-sm">Your stays</h2>
           <Card className="mt-4 p-5">
             <ReservationBrowser
+              propertyHrefs={Object.fromEntries(
+                myReservations.map((reservation) => [
+                  reservation.id,
+                  `/p/${reservation.property.slug}`,
+                ])
+              )}
               reservations={myReservations.map((reservation) => ({
                 visibility: "identified" as const,
                 id: reservation.id,
