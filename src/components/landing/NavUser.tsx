@@ -8,7 +8,12 @@ export async function NavUser() {
 
   if (!session) {
     return (
-      <Button render={<Link href="/sign-in" />} nativeButton={false} size="sm">
+      <Button
+        render={<Link href="/sign-in" />}
+        nativeButton={false}
+        size="sm"
+        className="rounded-(--radius-4xl)"
+      >
         Sign in
       </Button>
     )
@@ -21,7 +26,7 @@ export function NavUserFallback() {
   return (
     <span
       aria-hidden
-      className="block h-7 w-20 rounded-(--radius-2xl) bg-muted/60"
+      className="block h-7 w-20 rounded-(--radius-4xl) bg-muted/60"
     />
   )
 }
