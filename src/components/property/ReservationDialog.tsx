@@ -15,7 +15,11 @@ import {
 import { ReservationDecision } from "@/components/property/ReservationDecision"
 import { Button } from "@/components/ui/button"
 import { CommandDialog } from "@/components/ui/command-dialog"
-import { dayLabel, describeDuration, momentLabel } from "@/lib/calendar/month"
+import {
+  dayRangeLabel,
+  describeDuration,
+  momentLabel,
+} from "@/lib/calendar/month"
 import {
   type ReservationView,
   reserverName,
@@ -106,7 +110,7 @@ export function ReservationDialog({
       title={reservation ? reserverName(reservation) : ""}
       description={
         reservation
-          ? `${dayLabel(reservation.checkIn)} to ${dayLabel(reservation.checkOut)}`
+          ? dayRangeLabel(reservation.checkIn, reservation.checkOut)
           : undefined
       }
       footer={footer}

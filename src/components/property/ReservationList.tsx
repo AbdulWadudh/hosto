@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { dayLabel } from "@/lib/calendar/month"
+import { dayRangeLabel } from "@/lib/calendar/month"
 import {
   type ReservationView,
   reservationStatusLabel,
@@ -69,8 +69,7 @@ export function ReservationList({
                 {reserverName(reservation)}
               </p>
               <p className="truncate text-muted-foreground text-xs">
-                {dayLabel(reservation.checkIn)} to{" "}
-                {dayLabel(reservation.checkOut)}
+                {dayRangeLabel(reservation.checkIn, reservation.checkOut)}
               </p>
             </div>
 

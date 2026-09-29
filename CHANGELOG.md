@@ -88,6 +88,10 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   "03-Oct-2026, night" — since nobody picks a clock time, only a part of the day.
 - A stay no longer claims to be held until a date nobody chose. The turnover window is
   stated as what it is: four hours after they leave.
+- The button that sends a request says the same thing as the floating chip above it:
+  "Request 1 night - 20 hours", not just "Request 1 night".
+- A date range reads as 08-11 Oct 2026 rather than repeating the month and year at both
+  ends, which was squeezing the second date out of a list row next to its badge.
 - The day you leave is highlighted while you pick, the same as every other day in the
   range. The selection stopped one square short of where you clicked.
 - A stay is drawn as one ribbon across the days it covers, with the name written once and

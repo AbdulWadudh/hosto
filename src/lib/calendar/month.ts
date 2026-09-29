@@ -69,6 +69,20 @@ export function dayLabel(date: Date): string {
   return `${day}-${monthNames[date.getMonth()]}-${date.getFullYear()}`
 }
 
+export function dayRangeLabel(from: Date, to: Date): string {
+  const sameYear = from.getFullYear() === to.getFullYear()
+  const firstDay = String(from.getDate()).padStart(2, "0")
+  const lastDay = String(to.getDate()).padStart(2, "0")
+
+  if (sameYear && from.getMonth() === to.getMonth()) {
+    return `${firstDay}-${lastDay} ${monthNames[to.getMonth()]} ${to.getFullYear()}`
+  }
+  if (sameYear) {
+    return `${firstDay} ${monthNames[from.getMonth()]} - ${lastDay} ${monthNames[to.getMonth()]} ${to.getFullYear()}`
+  }
+  return `${dayLabel(from)} - ${dayLabel(to)}`
+}
+
 export function timeOfDay(date: Date): string {
   const hour = date.getHours()
   if (hour < 5) {
