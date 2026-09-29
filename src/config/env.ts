@@ -1,10 +1,10 @@
+const missing: string[] = []
+
 const required = (name: string): string => {
   const value = process.env[name]?.trim()
   if (!value) {
-    throw new Error(
-      `Missing required environment variable ${name}. ` +
-        "Set it in .env locally, or in the deployment's environment settings."
-    )
+    missing.push(name)
+    return ""
   }
   return value
 }
@@ -32,10 +32,10 @@ if (Boolean(googleClientId) !== Boolean(googleClientSecret)) {
   )
 }
 
-export const env = {
+const settings = {
   s3: {
     endpoint: required("S3_ENDPOINT"),
-    region: required("S3_REGION"),
+    region: optional("S3_REGION") ?? "us-east-1",
     bucket: required("S3_BUCKET"),
     accessKeyId: required("S3_ACCESS_KEY_ID"),
     secretAccessKey: required("S3_SECRET_ACCESS_KEY"),
@@ -51,3 +51,12 @@ export const env = {
       ? { clientId: googleClientId, clientSecret: googleClientSecret }
       : undefined,
 }
+
+if (missing.length > 0) {
+  throw new Error(
+    `Missing required environment variable${missing.length > 1 ? "s" : ""}: ${missing.join(", ")}. ` +
+      "Set them in .env locally, or in the deployment's environment settings."
+  )
+}
+
+export const env = settings
