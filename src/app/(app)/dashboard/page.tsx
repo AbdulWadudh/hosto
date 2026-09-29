@@ -148,6 +148,12 @@ export default async function DashboardPage() {
                   `/p/${reservation.property.slug}`,
                 ])
               )}
+              titles={Object.fromEntries(
+                myReservations.map((reservation) => [
+                  reservation.id,
+                  reservation.property.title,
+                ])
+              )}
               reservations={myReservations.map((reservation) => ({
                 visibility: "identified" as const,
                 id: reservation.id,
@@ -155,7 +161,7 @@ export default async function DashboardPage() {
                 checkOut: reservation.checkOut,
                 blockedUntil: reservation.blockedUntil,
                 status: reservation.status,
-                isYours: false,
+                isYours: true,
                 reserver: {
                   name: reservation.property.title,
                   email: reservation.guest.email,

@@ -20,10 +20,12 @@ const initialsOf = (name: string) =>
 
 export function ReservationList({
   reservations,
+  titles,
   focusedId = null,
   onPick,
 }: {
   reservations: ReservationView[]
+  titles?: Record<string, string>
   focusedId?: string | null
   onPick: (id: string) => void
 }) {
@@ -66,7 +68,7 @@ export function ReservationList({
 
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-sm">
-                {reserverName(reservation)}
+                {titles?.[reservation.id] ?? reserverName(reservation)}
               </p>
               <p className="truncate text-muted-foreground text-xs">
                 {dayRangeLabel(reservation.checkIn, reservation.checkOut)}

@@ -38,11 +38,13 @@ export function ReservationDialog({
   reservation,
   canDecide,
   propertyHref,
+  title,
   onClose,
 }: {
   reservation: ReservationView | null
   canDecide: boolean
   propertyHref?: string
+  title?: string
   onClose: () => void
 }) {
   const [armedFor, setArmedFor] = useState<string | null>(null)
@@ -97,7 +99,7 @@ export function ReservationDialog({
         }
       }}
       icon={Calendar03Icon}
-      title={reservation ? reserverName(reservation) : ""}
+      title={reservation ? (title ?? reserverName(reservation)) : ""}
       description={
         reservation
           ? dayRangeLabel(reservation.checkIn, reservation.checkOut)
