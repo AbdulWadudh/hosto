@@ -33,17 +33,21 @@ export function isSelectable(day: DayState): boolean {
 }
 
 function describe(day: DayState): string {
+  const by = day.span?.label ? ` by ${day.span.label}` : ""
   if (day.occupied) {
-    return "Booked"
+    return `Booked${by}`
+  }
+  if (day.pending) {
+    return `Requested${by}`
+  }
+  if (day.isLeavingDay) {
+    return `Leaving day${by}`
   }
   if (day.inBuffer) {
     return "Turnover"
   }
   if (day.isPast) {
     return "Past"
-  }
-  if (day.pending) {
-    return "Requested"
   }
   return "Free"
 }
@@ -56,6 +60,7 @@ export function MonthCalendar({
   highlight,
   onDayDown,
   onDayEnter,
+  onSpanPick,
 }: {
   spans: Span[]
   initialYear: number
@@ -64,6 +69,7 @@ export function MonthCalendar({
   highlight?: { checkIn: Date; checkOut: Date } | null
   onDayDown?: (date: Date) => void
   onDayEnter?: (date: Date) => void
+  onSpanPick?: (id: string) => void
 }) {
   const [cursor, setCursor] = useState({
     year: initialYear,
@@ -157,7 +163,6 @@ export function MonthCalendar({
         className="grid select-none grid-cols-7 gap-1"
       >
         {days.map((day) => {
-          const split = day.isDeparture && day.inBuffer
           const label = describe(day)
           const picked = inRange(day.date)
           const isCheckout =
@@ -165,6 +170,8 @@ export function MonthCalendar({
             selection.to.getTime() !== selection.from?.getTime() &&
             sameDay(day.date, selection.to)
           const canPick = Boolean(onDayDown) && isSelectable(day)
+          const spanId = day.span?.id ?? null
+          const canInspect = Boolean(onSpanPick) && !canPick && spanId !== null
           const highlighted = Boolean(
             highlight && coversDay(highlight, day.date)
           )
@@ -179,20 +186,23 @@ export function MonthCalendar({
                 : "border-transparent opacity-35"),
             picked && "bg-primary text-primary-foreground ring-2 ring-primary",
             isCheckout && "ring-2 ring-primary ring-offset-1 ring-offset-card",
-            !picked &&
-              day.occupied &&
-              !split &&
-              "bg-primary text-primary-foreground",
+            !picked && day.occupied && "bg-primary text-primary-foreground",
             !picked &&
               !day.occupied &&
+              !day.isLeavingDay &&
               day.inBuffer &&
-              !split &&
               "bg-muted-foreground/30",
             !picked &&
               !day.occupied &&
               !day.inBuffer &&
               day.pending &&
               "border-primary/40 border-dashed bg-primary/10",
+            !picked &&
+              !day.occupied &&
+              day.isLeavingDay &&
+              (day.span?.status === "PENDING"
+                ? "border-primary/40 border-dashed bg-primary/5"
+                : "bg-primary/35"),
             !picked &&
               !day.occupied &&
               !day.inBuffer &&
@@ -205,6 +215,7 @@ export function MonthCalendar({
               !day.isPast &&
               "bg-background",
             canPick && !picked && "hover:border-primary hover:bg-primary/15",
+            canInspect && "cursor-pointer hover:brightness-125",
             highlighted &&
               "z-10 ring-2 ring-foreground/70 ring-offset-1 ring-offset-card"
           )
@@ -215,7 +226,7 @@ export function MonthCalendar({
                 "absolute top-0.5 left-1 font-mono",
                 day.isToday && "underline underline-offset-2",
                 day.isPast && !day.occupied && !day.inBuffer && "opacity-40",
-                day.occupied || split || picked
+                day.occupied || picked
                   ? "text-primary-foreground"
                   : isCheckout
                     ? "text-primary"
@@ -226,16 +237,41 @@ export function MonthCalendar({
             </span>
           )
 
-          const splitOverlay = split && (
-            <span className="absolute inset-0 bg-[linear-gradient(135deg,var(--color-primary)_0_49.4%,transparent_49.4%_50.6%,var(--color-muted-foreground)_50.6%_100%)] opacity-90" />
-          )
+          const name = day.span?.label &&
+            (day.occupied || day.pending || day.isLeavingDay) && (
+              <span
+                className={cn(
+                  "absolute inset-x-0.5 bottom-0.5 truncate text-center text-[0.5rem] leading-tight",
+                  day.occupied || picked
+                    ? "text-primary-foreground/90"
+                    : "text-muted-foreground"
+                )}
+              >
+                {day.span.label}
+              </span>
+            )
 
           if (!canPick) {
+            if (!canInspect) {
+              return (
+                <div key={day.key} title={title} className={surface}>
+                  {number}
+                  {name}
+                </div>
+              )
+            }
             return (
-              <div key={day.key} title={title} className={surface}>
-                {splitOverlay}
+              <button
+                key={day.key}
+                type="button"
+                title={title}
+                aria-label={`${dayLabel(day.date)}, ${label}`}
+                onClick={() => spanId && onSpanPick?.(spanId)}
+                className={surface}
+              >
                 {number}
-              </div>
+                {name}
+              </button>
             )
           }
 
@@ -255,8 +291,8 @@ export function MonthCalendar({
               }}
               className={surface}
             >
-              {splitOverlay}
               {number}
+              {name}
               {isCheckout && (
                 <span className="absolute right-0.5 bottom-0.5 font-mono text-[0.5rem] text-primary uppercase">
                   out
@@ -275,6 +311,10 @@ export function MonthCalendar({
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-primary" />
           Booked
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="size-2 rounded-full bg-primary/35" />
+          Leaving
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-muted-foreground/40" />

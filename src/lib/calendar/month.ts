@@ -8,11 +8,13 @@ export type DayState = {
   occupied: boolean
   inBuffer: boolean
   pending: boolean
-  isArrival: boolean
-  isDeparture: boolean
+  isLeavingDay: boolean
+  span: Span | null
 }
 
 export type Span = {
+  id: string
+  label: string | null
   checkIn: Date
   checkOut: Date
   blockedUntil: Date
@@ -51,12 +53,6 @@ const monthNames = [
   "Dec",
 ]
 
-const clockFormat = new Intl.DateTimeFormat("en-GB", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-})
-
 export function monthLabel(year: number, month: number): string {
   return labelFormat.format(new Date(year, month, 1))
 }
@@ -84,7 +80,7 @@ export function timeOfDay(date: Date): string {
 }
 
 export function momentLabel(date: Date): string {
-  return `${dayLabel(date)}, ${timeOfDay(date)} ${clockFormat.format(date)}`
+  return `${dayLabel(date)}, ${timeOfDay(date)}`
 }
 
 export function rangeHasConflict(from: Date, to: Date, spans: Span[]): boolean {
@@ -159,29 +155,33 @@ export function buildMonth(
   const gridStart = addDays(startOfDay(first), -leading)
   const todayTime = today ? startOfDay(today).getTime() : null
 
+  const confirmed = spans.filter((span) => span.status !== "PENDING")
+  const isDayVisit = (span: Span) =>
+    startOfDay(span.checkIn).getTime() === startOfDay(span.checkOut).getTime()
+  const holdsNight = (span: Span, day: Date) =>
+    isDayVisit(span)
+      ? startOfDay(span.checkIn).getTime() === day.getTime()
+      : occupiesNight(span.checkIn, span.checkOut, day)
+  const leaves = (span: Span, day: Date) =>
+    !isDayVisit(span) && startOfDay(span.checkOut).getTime() === day.getTime()
+
   return Array.from({ length: 42 }, (_, index) => {
     const date = addDays(gridStart, index)
-    const confirmed = spans.filter((span) => span.status !== "PENDING")
-    const pendingSpans = spans.filter((span) => span.status === "PENDING")
 
-    const occupied = confirmed.some((span) =>
-      occupiesNight(span.checkIn, span.checkOut, date)
-    )
+    const night =
+      spans.find(
+        (span) => span.status !== "PENDING" && holdsNight(span, date)
+      ) ??
+      spans.find((span) => holdsNight(span, date)) ??
+      null
+    const leaving = night
+      ? null
+      : (spans.find((span) => leaves(span, date)) ?? null)
+
     const inBuffer = confirmed.some(
       (span) =>
-        !occupiesNight(span.checkIn, span.checkOut, date) &&
+        !holdsNight(span, date) &&
         overlapsDay(span.checkOut, span.blockedUntil, date)
-    )
-    const pending = pendingSpans.some((span) =>
-      occupiesNight(span.checkIn, span.checkOut, date)
-    )
-
-    const next = addDays(date, 1)
-    const isArrival = confirmed.some(
-      (span) => span.checkIn >= date && span.checkIn < next
-    )
-    const isDeparture = confirmed.some(
-      (span) => span.checkOut > date && span.checkOut <= next
     )
 
     return {
@@ -191,11 +191,11 @@ export function buildMonth(
       inMonth: date.getMonth() === month,
       isToday: todayTime !== null && date.getTime() === todayTime,
       isPast: todayTime !== null && date.getTime() < todayTime,
-      occupied,
+      occupied: night !== null && night.status !== "PENDING",
+      pending: night !== null && night.status === "PENDING",
       inBuffer,
-      pending,
-      isArrival,
-      isDeparture,
+      isLeavingDay: leaving !== null,
+      span: night ?? leaving,
     }
   })
 }

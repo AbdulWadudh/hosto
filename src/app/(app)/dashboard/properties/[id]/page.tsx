@@ -30,6 +30,7 @@ export default async function PropertySettingsPage({
           checkOut: true,
           blockedUntil: true,
           status: true,
+          guest: { select: { name: true } },
         },
       },
     },
@@ -62,7 +63,10 @@ export default async function PropertySettingsPage({
 
       <Card className="mt-8 p-5">
         <MonthCalendar
-          spans={property.reservations}
+          spans={property.reservations.map((reservation) => ({
+            ...reservation,
+            label: reservation.guest.name,
+          }))}
           initialYear={now.getFullYear()}
           initialMonth={now.getMonth()}
         />
