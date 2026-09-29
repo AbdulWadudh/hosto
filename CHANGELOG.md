@@ -35,6 +35,10 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - A settings screen per property, including whether it is taking requests at all.
 - Approve or reject a request from the request itself, and revoke a booking you already
   approved. Only for dates that have not yet passed.
+- A request you turned down stays on the list, greyed, with an Approve after all on it.
+  Changing your mind was always meant to be possible; deleting the evidence was not.
+  The person who asked keeps seeing it too, marked Turned down, rather than watching
+  their request disappear without a word.
 - Picking a stay from the list marks it on the calendar and turns to the month it falls
   in, so you can see a stay rather than read its dates.
 - Every day of a stay carries the name of whoever has it, and clicking a taken day opens
@@ -71,9 +75,9 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   stated as what it is: four hours after they leave.
 - The day someone leaves is drawn as part of their stay rather than as anonymous
   turnover, so a stay from the third to the fourth marks both days.
-- On a phone, a dialog sits at the bottom of the screen with room around it and its
-  close at the bottom right, within reach of a thumb, instead of floating in the middle
-  with its close in the far corner.
+- On a phone, a dialog sits flush against the bottom of the screen with its close at the
+  bottom right, within reach of a thumb, instead of floating in the middle with its
+  close in the far corner.
 
 - Deployments no longer start against a database that was never migrated. On hosts that
   build and serve separately, the migration step was being skipped entirely.

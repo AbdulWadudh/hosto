@@ -38,8 +38,8 @@ export function CommandDialog({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "top-auto right-4 bottom-4 left-4 flex max-h-[85svh] w-auto max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden p-0",
-          "sm:-translate-x-1/2 sm:-translate-y-1/2 sm:top-1/2 sm:right-auto sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-lg",
+          "top-auto right-0 bottom-0 left-0 flex max-h-[85svh] w-auto max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-b-none p-0",
+          "sm:-translate-x-1/2 sm:-translate-y-1/2 sm:top-1/2 sm:right-auto sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-lg sm:rounded-b-xl",
           className
         )}
       >
