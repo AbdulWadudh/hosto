@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { type FormEvent, useState } from "react"
 import { AuthError } from "@/components/auth/AuthError"
 import { GoogleButton } from "@/components/auth/GoogleButton"
+import { PasswordField } from "@/components/auth/PasswordField"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -60,17 +61,7 @@ export function SignInForm() {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            className="h-11"
-          />
-        </div>
+        <PasswordField autoComplete="current-password" />
 
         <AuthError message={error} />
 
