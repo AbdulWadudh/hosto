@@ -16,6 +16,8 @@ import {
   type Span,
   toDateInput,
 } from "@/lib/calendar/month"
+import { TimeChoice } from "@/components/property/TimeChoice"
+import { config } from "@/config"
 import {
   requestDates,
   type RequestDatesState,
@@ -81,7 +83,7 @@ export function AvailabilityBooking({
         !current.to &&
         date.getTime() === current.from.getTime()
       ) {
-        return { from: null, to: null }
+        return { from: date, to: date }
       }
       return { from: date, to: null }
     })
@@ -111,6 +113,11 @@ export function AvailabilityBooking({
     selection.from && selection.to
       ? nightsBetween(selection.from, selection.to)
       : 0
+  const isDayVisit = nights === 0 && selection.to !== null
+  const days = nights + 1
+  const stayLabel = isDayVisit
+    ? "1 day, no overnight"
+    : `${days} day${days === 1 ? "" : "s"}, ${nights} night${nights === 1 ? "" : "s"}`
 
   return (
     <Card className="p-5">
@@ -124,7 +131,7 @@ export function AvailabilityBooking({
       />
 
       {canBook && selection.from && (
-        <div className="pointer-events-none sticky bottom-4 z-20 mt-4 flex justify-center">
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">
           <motion.div
             initial={reduced ? false : { y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -133,8 +140,8 @@ export function AvailabilityBooking({
           >
             <span className="text-xs">
               {selection.to
-                ? `${dayLabel(selection.from)} to ${dayLabel(selection.to)} · ${nights} night${nights === 1 ? "" : "s"}`
-                : `${dayLabel(selection.from)} · pick the day you leave`}
+                ? `${dayLabel(selection.from)} to ${dayLabel(selection.to)} · ${stayLabel}`
+                : `${dayLabel(selection.from)} · pick the day you leave, or click again for a day visit`}
             </span>
             <Button
               type="button"
@@ -184,6 +191,31 @@ export function AvailabilityBooking({
                     value={toDateInput(selection.to)}
                   />
 
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <TimeChoice
+                      key={`arrive-${isDayVisit}`}
+                      name="arrivalTime"
+                      legend="Arriving"
+                      choices={config.booking.arrivalChoices}
+                      defaultTime={
+                        isDayVisit
+                          ? config.booking.dayVisit.arrival
+                          : config.booking.arrival
+                      }
+                    />
+                    <TimeChoice
+                      key={`leave-${isDayVisit}`}
+                      name="departureTime"
+                      legend="Leaving"
+                      choices={config.booking.departureChoices}
+                      defaultTime={
+                        isDayVisit
+                          ? config.booking.dayVisit.departure
+                          : config.booking.departure
+                      }
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="notes">
                       {isOwner
@@ -217,9 +249,7 @@ export function AvailabilityBooking({
                     >
                       {isPending
                         ? "Saving..."
-                        : isOwner
-                          ? `Block ${nights} night${nights === 1 ? "" : "s"}`
-                          : `Request ${nights} night${nights === 1 ? "" : "s"}`}
+                        : `${isOwner ? "Block" : "Request"} ${stayLabel}`}
                     </Button>
                     <Button
                       type="button"

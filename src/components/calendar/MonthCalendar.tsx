@@ -86,8 +86,10 @@ export function MonthCalendar({
     if (!selection?.from) {
       return false
     }
-    const end = selection.to ?? selection.from
-    return date >= selection.from && date <= end
+    if (!selection.to || selection.to.getTime() === selection.from.getTime()) {
+      return date.getTime() === selection.from.getTime()
+    }
+    return date >= selection.from && date < selection.to
   }
 
   const sameDay = (a: Date, b: Date) => a.getTime() === b.getTime()
@@ -142,14 +144,10 @@ export function MonthCalendar({
           const split = day.isDeparture && day.inBuffer
           const label = describe(day)
           const picked = inRange(day.date)
-          const isArrivalEdge =
-            picked &&
-            selection?.from !== undefined &&
-            selection?.from !== null &&
+          const isCheckout =
             selection?.to != null &&
-            sameDay(day.date, selection.from)
-          const isDepartureEdge =
-            picked && selection?.to != null && sameDay(day.date, selection.to)
+            selection.to.getTime() !== selection.from?.getTime() &&
+            sameDay(day.date, selection.to)
           const canPick = Boolean(onDayDown) && isSelectable(day)
           const title = `${dayLabel(day.date)} - ${label}`
 
@@ -160,15 +158,8 @@ export function MonthCalendar({
               (canPick
                 ? "border-border/30 opacity-70"
                 : "border-transparent opacity-35"),
-            picked &&
-              !isArrivalEdge &&
-              !isDepartureEdge &&
-              "bg-primary/85 text-primary-foreground ring-2 ring-primary",
-            isArrivalEdge &&
-              "bg-[linear-gradient(135deg,transparent_0_49.4%,var(--color-primary)_50.6%_100%)] ring-2 ring-primary",
-            isDepartureEdge &&
-              !isArrivalEdge &&
-              "bg-[linear-gradient(135deg,var(--color-primary)_0_49.4%,transparent_50.6%_100%)] ring-2 ring-primary",
+            picked && "bg-primary text-primary-foreground ring-2 ring-primary",
+            isCheckout && "ring-2 ring-primary ring-offset-1 ring-offset-card",
             !picked &&
               day.occupied &&
               !split &&
@@ -203,11 +194,11 @@ export function MonthCalendar({
                 "absolute top-0.5 left-1 font-mono",
                 day.isToday && "underline underline-offset-2",
                 day.isPast && !day.occupied && !day.inBuffer && "opacity-40",
-                (day.occupied || split || picked) &&
-                  !isArrivalEdge &&
-                  !isDepartureEdge
+                day.occupied || split || picked
                   ? "text-primary-foreground"
-                  : "text-muted-foreground"
+                  : isCheckout
+                    ? "text-primary"
+                    : "text-muted-foreground"
               )}
             >
               {day.day}
@@ -245,6 +236,11 @@ export function MonthCalendar({
             >
               {splitOverlay}
               {number}
+              {isCheckout && (
+                <span className="absolute right-0.5 bottom-0.5 font-mono text-[0.5rem] text-primary uppercase">
+                  out
+                </span>
+              )}
             </button>
           )
         })}

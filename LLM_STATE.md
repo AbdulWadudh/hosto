@@ -286,7 +286,21 @@ is tap-arrival then tap-departure. That is deliberate: making drag work on touch
 Days outside the shown month are still selectable. Disabling them meant that on the last
 day of a month exactly one day could be picked, which is how this was found.
 
-**Arrival and departure are half cells.** A stay from the third to the fourth is one
+**Occupancy means nights, not days touched.** A stay from the tenth at 15:00 to the
+fifteenth at 11:00 fills five squares, not six: the fifteenth is a departure, so it shows
+as turnover instead. The number of filled squares equals the number of nights, and the
+summary reads "4 days, 3 nights" because a night count alone kept being misread.
+
+Half cells were tried for arrival and departure and rejected — two half-filled squares at
+the ends of a range were read as "which days am I actually here?". The checkout day now
+carries an outline and an `out` marker instead of a fill.
+
+**Times are real.** `config.booking` holds morning/afternoon/evening/night for both
+directions, so a reservation is `10 Nov 15:00 -> 15 Nov 11:00` rather than midnight to
+midnight. That is what makes a same-day visit expressible at all: `checkOut > checkIn`
+is a database CHECK, so without times `from === to` could never be saved.
+
+**Old note, superseded:** A stay from the third to the fourth is one
 night, not two days, and filling both cells solidly said otherwise. Arrival fills from the
 diagonal down, departure up to it — the same language as a turnaround day. Past days carry
 a hatch, and the legend names Free and Past, because an unavailable day previously looked

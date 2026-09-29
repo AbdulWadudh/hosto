@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { config } from "@/config"
 import { prisma } from "@/lib/prisma"
 import { requireSession } from "@/lib/session"
 
@@ -49,14 +50,28 @@ export async function requestDates(
     return { error: "This place is not taking requests at the moment." }
   }
 
-  const checkIn = new Date(String(form.get("checkIn") ?? ""))
-  const checkOut = new Date(String(form.get("checkOut") ?? ""))
+  const checkInDate = String(form.get("checkIn") ?? "")
+  const checkOutDate = String(form.get("checkOut") ?? "")
+  const isDayVisit = checkInDate === checkOutDate
+  const arrivalTime =
+    String(form.get("arrivalTime") ?? "") ||
+    (isDayVisit ? config.booking.dayVisit.arrival : config.booking.arrival)
+  const departureTime =
+    String(form.get("departureTime") ?? "") ||
+    (isDayVisit ? config.booking.dayVisit.departure : config.booking.departure)
+
+  const checkIn = new Date(`${checkInDate}T${arrivalTime}`)
+  const checkOut = new Date(`${checkOutDate}T${departureTime}`)
 
   if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime())) {
-    return { error: "Pick both an arrival and a departure date." }
+    return { error: "Pick both an arrival and a departure." }
   }
   if (checkOut <= checkIn) {
-    return { error: "Departure has to be after arrival." }
+    return {
+      error: isDayVisit
+        ? "The time you leave has to be after the time you arrive."
+        : "Departure has to be after arrival.",
+    }
   }
 
   const notes = String(form.get("notes") ?? "")

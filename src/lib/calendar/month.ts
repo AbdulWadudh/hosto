@@ -76,6 +76,10 @@ function overlapsDay(from: Date, to: Date, day: Date): boolean {
   return from < next && to > day
 }
 
+function occupiesNight(checkIn: Date, checkOut: Date, day: Date): boolean {
+  return startOfDay(checkIn) <= day && day < startOfDay(checkOut)
+}
+
 export function buildMonth(
   year: number,
   month: number,
@@ -93,15 +97,15 @@ export function buildMonth(
     const pendingSpans = spans.filter((span) => span.status === "PENDING")
 
     const occupied = confirmed.some((span) =>
-      overlapsDay(span.checkIn, span.checkOut, date)
+      occupiesNight(span.checkIn, span.checkOut, date)
     )
     const inBuffer = confirmed.some(
       (span) =>
-        !overlapsDay(span.checkIn, span.checkOut, date) &&
+        !occupiesNight(span.checkIn, span.checkOut, date) &&
         overlapsDay(span.checkOut, span.blockedUntil, date)
     )
     const pending = pendingSpans.some((span) =>
-      overlapsDay(span.checkIn, span.blockedUntil, date)
+      occupiesNight(span.checkIn, span.checkOut, date)
     )
 
     const next = addDays(date, 1)

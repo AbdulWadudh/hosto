@@ -25,6 +25,8 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Address search on the map, so guests can get directions to the door.
 - A page for every property that anyone can open, with a month calendar showing which
   nights are taken, which are turnover, and which have been asked for.
+- Day visits: arrive in the morning and leave the same night, with no overnight at all.
+- Choose when you arrive and leave — morning, afternoon, evening or night.
 - Asking for dates on the calendar itself: click or drag across the nights you want.
   Click inside a chosen range to shorten it, and a floating chip shows the range with
   a way to clear it.
@@ -49,6 +51,9 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - The night you arrive and the night you leave are drawn as half days, so a stay from
   the third to the fourth reads as the one night it is rather than two whole days.
 - A range can no longer be drawn straight through nights that are already taken.
+- A stay reads as "4 days, 3 nights" rather than a night count on its own, and the
+  number of filled squares now matches the number of nights.
+- Picking a single day shows as selected instead of leaving the calendar blank.
 
 - Deployments no longer start against a database that was never migrated. On hosts that
   build and serve separately, the migration step was being skipped entirely.
