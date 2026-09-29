@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { stayCancelled } from "@/lib/notify"
 import { prisma } from "@/lib/prisma"
 import { requireSession } from "@/lib/session"
 
@@ -23,7 +24,11 @@ export async function cancelReservation(
       guestId: true,
       status: true,
       blockedUntil: true,
-      property: { select: { slug: true } },
+      checkIn: true,
+      checkOut: true,
+      property: {
+        select: { slug: true, title: true, owner: { select: { email: true } } },
+      },
     },
   })
 
@@ -44,6 +49,18 @@ export async function cancelReservation(
     where: { id },
     data: { status: "CANCELLED", endedReason: reason || null },
   })
+
+  await stayCancelled(
+    reservation.property.owner.email,
+    user.name,
+    {
+      checkIn: reservation.checkIn,
+      checkOut: reservation.checkOut,
+      propertyTitle: reservation.property.title,
+      propertySlug: reservation.property.slug,
+    },
+    reason || null
+  )
 
   revalidatePath(`/p/${reservation.property.slug}`)
   revalidatePath("/dashboard")
