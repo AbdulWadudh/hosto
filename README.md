@@ -70,7 +70,8 @@ profile. It is idempotent and runs on every `services:up`.
 | | |
 |---|---|
 | `bun run dev` | Docker up, then Next dev |
-| `bun run build` / `start` | Production build and serve |
+| `bun run build` | Apply migrations, then build |
+| `bun run start` | Apply migrations, then serve |
 | `bun run lint` / `format` | Biome |
 | `bun run typecheck` | `tsc --noEmit` |
 | `bun run services:up` / `services:down` | Docker stack only |
@@ -136,6 +137,29 @@ src/lib/          prisma client, auth, site constants
 .spec/            00_CORE_MVP.md is in scope; backlog/ is explicitly not
 LLM_STATE.md      decisions an agent cannot recover from the code
 ```
+
+## Deploying
+
+Migrations run in **both** `build` and `start`, deliberately. Platforms differ in which
+one they give you:
+
+- **Vercel and similar** run `next build` and serve through their own runtime. Your
+  `start` script is never executed, so a migration gate that only lives there silently
+  never runs and production comes up against an empty database.
+- **A container or a plain Node host** runs `start`, and may build elsewhere.
+
+`migrate deploy` is idempotent, so running it twice costs nothing.
+
+Required environment variables in the deployment, not just in local `.env`:
+
+| | |
+|---|---|
+| `DATABASE_URL` | must be reachable **from the deployment**. A `localhost` URL works on your machine and never in a serverless function. |
+| `BETTER_AUTH_SECRET` | any 32+ byte random string |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | both or neither |
+
+They are validated at import, so a missing one fails the build with the variable's name
+rather than turning into a 500 at runtime.
 
 ## Google sign-in
 

@@ -28,6 +28,11 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 
 ### Fixed
 
+- Deployments no longer start against a database that was never migrated. On hosts that
+  build and serve separately, the migration step was being skipped entirely.
+- A missing setting now stops the deployment and names itself, instead of turning every
+  sign-in into an unexplained server error.
+
 - Buttons that are really links now announce themselves properly to a screen reader.
 - A page no longer crashes when the browser autofills a form. The dark-mode shortcut
   assumed every key press carries a key; autofill does not.

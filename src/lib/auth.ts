@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin } from "better-auth/plugins"
 import { config } from "@/config"
+import { env } from "@/config/env"
 import { prisma } from "@/lib/prisma"
 
 export const auth = betterAuth({
@@ -15,11 +16,7 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: config.auth.minPasswordLength,
   },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
-  },
+  secret: env.authSecret,
+  socialProviders: env.google ? { google: env.google } : {},
   plugins: [admin()],
 })

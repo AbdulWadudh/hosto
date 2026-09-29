@@ -151,6 +151,29 @@ route preview OAuth through a fixed host if that is ever needed.
 Note the `/v1/`. Every guide online shows `/api/auth/callback/google`, the Better Auth
 default. Bumping the API version means updating the Google console in the same breath.
 
+### D9 - Migrations run in `build` as well as `start`
+
+Vercel never executes the `start` script. It runs `next build` and serves through its own
+runtime, so a migration gate living only in `start` never fires and production comes up
+against an empty database — every endpoint that touches it returns 500 while endpoints
+that do not, like `/api/v1/auth/ok`, keep returning 200. That is exactly how this was
+found, and it is a confusing failure to debug because it looks provider-specific.
+
+`migrate deploy` is idempotent, so it sits in both scripts.
+
+Consequence: `bun run build` now needs a reachable database. That is a real cost and it
+was accepted, because a build that cannot reach the database would have produced a deploy
+that cannot either.
+
+### D10 - Environment is validated at import, and fails loudly
+
+`src/config/env.ts` throws on a missing `DATABASE_URL` or `BETTER_AUTH_SECRET`, and on
+`GOOGLE_CLIENT_ID` set without `GOOGLE_CLIENT_SECRET`. A deploy missing one now fails with
+the variable's name instead of returning an unexplained 500.
+
+It is **server-only**. Never import it from a client component — `src/config/index.ts` is
+the one that is safe to share.
+
 ## Changelog
 
 `CHANGELOG.md` holds the short, user-facing summary in plain language. Long form — why, what
