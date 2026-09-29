@@ -1,0 +1,72 @@
+import type { ReservationStatus } from "@/generated/prisma/client"
+
+export type ReservationRow = {
+  id: string
+  checkIn: Date
+  checkOut: Date
+  blockedUntil: Date
+  status: ReservationStatus
+  notes: string | null
+  guestId: string
+  guest: { name: string; email: string; image: string | null }
+}
+
+export type ReservationView =
+  | {
+      visibility: "identified"
+      id: string
+      checkIn: Date
+      checkOut: Date
+      blockedUntil: Date
+      status: ReservationStatus
+      reserver: { name: string; email: string; image: string | null }
+      notes: string | null
+    }
+  | {
+      visibility: "anonymous"
+      id: string
+      checkIn: Date
+      checkOut: Date
+      blockedUntil: Date
+      status: "RESERVED"
+    }
+
+export type Viewer = {
+  id: string
+  isAdmin: boolean
+} | null
+
+export function projectReservation(
+  reservation: ReservationRow,
+  property: { ownerId: string; showReserverIdentity: boolean },
+  viewer: Viewer
+): ReservationView {
+  const maySeeIdentity =
+    property.showReserverIdentity ||
+    (viewer !== null &&
+      (viewer.isAdmin ||
+        viewer.id === property.ownerId ||
+        viewer.id === reservation.guestId))
+
+  if (maySeeIdentity) {
+    return {
+      visibility: "identified",
+      id: reservation.id,
+      checkIn: reservation.checkIn,
+      checkOut: reservation.checkOut,
+      blockedUntil: reservation.blockedUntil,
+      status: reservation.status,
+      reserver: reservation.guest,
+      notes: reservation.notes,
+    }
+  }
+
+  return {
+    visibility: "anonymous",
+    id: reservation.id,
+    checkIn: reservation.checkIn,
+    checkOut: reservation.checkOut,
+    blockedUntil: reservation.blockedUntil,
+    status: "RESERVED",
+  }
+}

@@ -234,6 +234,32 @@ bundle with different focus and keyboard behaviour. Reordering, the one thing it
 was missing, was added natively instead — pointer drag plus explicit move buttons, since a
 draggable element is not operable from a keyboard.
 
+### D14 - Migration folder names must sort before the migrations that depend on them
+
+The baseline was hand-named `20260930000000_init` while `migrate dev` stamped the next one
+`20260929204832_property_location` from the real clock. Prisma orders by folder name, so
+the baseline sorted **after** the migration that needed its tables, and a deploy to any
+empty database failed with `relation "property" does not exist`. The development database
+hid it because both had already been applied there.
+
+It is now `20260929000000_init`. Never hand-pick a migration timestamp without checking it
+sorts first, and prove a change by replaying onto a scratch database rather than trusting
+the development one.
+
+### D15 - Reservation privacy is a projection, and it is only worth what the page renders
+
+`projectReservation` returns a discriminated union: `identified` carries the reserver and
+notes, `anonymous` carries dates and a status collapsed to `RESERVED`. Identity is shown
+only when the viewer is an admin, owns the property, is the reserver, or the property has
+`showReserverIdentity` on. Non-owners never receive `PENDING` rows at all, so pending
+interest does not leak either.
+
+A warning about testing this. Scanning the public HTML for the reserver's name passed
+before any component rendered a name — the test was measuring nothing. It only became
+evidence once the page displayed identity when authorised. **A privacy check that passes
+against a page which never shows the field is not a privacy check.** The pair now runs
+both ways, and `bun run db:check` asserts the projection directly.
+
 ## Changelog
 
 `CHANGELOG.md` holds the short, user-facing summary in plain language. Long form — why, what

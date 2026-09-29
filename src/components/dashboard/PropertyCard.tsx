@@ -1,18 +1,27 @@
-import { DirectionsIcon } from "@hugeicons/core-free-icons"
+import {
+  Image01Icon,
+  Navigation03Icon,
+  Settings02Icon,
+} from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
+import Image from "next/image"
+import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
 export type PropertySummary = {
   id: string
+  slug: string
   title: string
   address: string
+  coverUrl: string | null
   latitude: number | null
   longitude: number | null
   placeId: string | null
   turnoverBufferMinutes: number
   showReserverIdentity: boolean
+  isBookable: boolean
   pendingRequests: number
 }
 
@@ -49,45 +58,87 @@ export function directionsUrl(property: {
 
 export function PropertyCard({ property }: { property: PropertySummary }) {
   return (
-    <Card className="flex flex-col gap-3 p-5">
-      <div className="flex items-start justify-between gap-3">
+    <Card className="group flex flex-col overflow-hidden p-0">
+      <Link
+        href={`/p/${property.slug}`}
+        className="relative block aspect-16/10 w-full overflow-hidden bg-muted"
+      >
+        {property.coverUrl ? (
+          <Image
+            src={property.coverUrl}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 100vw, 45vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        ) : (
+          <span className="flex size-full items-center justify-center text-muted-foreground/60">
+            <HugeiconsIcon icon={Image01Icon} size={22} />
+          </span>
+        )}
+
+        <span className="absolute top-2.5 right-2.5 flex gap-1.5">
+          {property.pendingRequests > 0 && (
+            <Badge>{property.pendingRequests} waiting</Badge>
+          )}
+          {!property.isBookable && <Badge variant="secondary">Closed</Badge>}
+        </span>
+      </Link>
+
+      <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="min-w-0">
           <h3 className="truncate font-heading font-semibold tracking-tight">
-            {property.title}
+            <Link
+              href={`/p/${property.slug}`}
+              className="outline-none after:absolute after:inset-0 focus-visible:underline"
+            >
+              {property.title}
+            </Link>
           </h3>
           <p className="truncate text-muted-foreground text-sm">
             {property.address}
           </p>
         </div>
-        {property.pendingRequests > 0 && (
-          <Badge className="shrink-0">{property.pendingRequests} waiting</Badge>
-        )}
-      </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-xs">
-        <span className="rounded-(--radius-2xl) border border-primary/25 bg-primary/10 px-2.5 py-1">
-          {describeBuffer(property.turnoverBufferMinutes)}
-        </span>
-        <span className="rounded-(--radius-2xl) border bg-muted/40 px-2.5 py-1 text-muted-foreground">
-          {property.showReserverIdentity ? "Names shown" : "Names hidden"}
-        </span>
-        <Button
-          render={
-            <a
-              href={directionsUrl(property)}
-              target="_blank"
-              rel="noreferrer noopener"
-            />
-          }
-          nativeButton={false}
-          variant="ghost"
-          size="icon-sm"
-          aria-label={`Directions to ${property.title}`}
-          title="Directions from where you are"
-          className="ml-auto text-muted-foreground hover:text-foreground"
-        >
-          <HugeiconsIcon icon={DirectionsIcon} size={15} />
-        </Button>
+        <div className="mt-auto flex flex-wrap items-center gap-2 text-xs">
+          <span className="rounded-(--radius-2xl) border border-primary/25 bg-primary/10 px-2.5 py-1">
+            {describeBuffer(property.turnoverBufferMinutes)}
+          </span>
+          <span className="rounded-(--radius-2xl) border bg-muted/40 px-2.5 py-1 text-muted-foreground">
+            {property.showReserverIdentity ? "Names shown" : "Names hidden"}
+          </span>
+
+          <span className="relative z-10 ml-auto flex gap-1">
+            <Button
+              render={
+                <a
+                  href={directionsUrl(property)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                />
+              }
+              nativeButton={false}
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Directions to ${property.title}`}
+              title="Directions from where you are"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <HugeiconsIcon icon={Navigation03Icon} size={15} />
+            </Button>
+            <Button
+              render={<Link href={`/dashboard/properties/${property.id}`} />}
+              nativeButton={false}
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Settings for ${property.title}`}
+              title="Settings"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <HugeiconsIcon icon={Settings02Icon} size={15} />
+            </Button>
+          </span>
+        </div>
       </div>
     </Card>
   )

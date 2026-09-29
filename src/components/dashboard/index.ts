@@ -9,3 +9,7 @@ export {
   type PropertySummary,
 } from "@/components/dashboard/PropertyCard"
 export { PropertyForm } from "@/components/dashboard/PropertyForm"
+export {
+  PropertySettingsForm,
+  type PropertySettings,
+} from "@/components/dashboard/PropertySettingsForm"

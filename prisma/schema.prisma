@@ -32,6 +32,7 @@ model Property {
   maxGuests             Int
   turnoverBufferMinutes Int           @default(240)
   showReserverIdentity  Boolean       @default(false)
+  isBookable            Boolean       @default(true)
   ownerId               String
   owner                 User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   reservations          Reservation[]

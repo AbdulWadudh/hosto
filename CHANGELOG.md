@@ -23,6 +23,10 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Photographs: drop them in or choose them, watch each one upload, drag to reorder,
   and the first is the cover.
 - Address search on the map, so guests can get directions to the door.
+- A page for every property that anyone can open, with a month calendar showing which
+  nights are taken, which are turnover, and which have been asked for.
+- Asking for dates: pick an arrival and a departure and send it to the owner.
+- A settings screen per property, including whether it is taking requests at all.
 - A landing page, plus the Terms and Privacy pages Google asks for before it will verify sign-in.
 - Postgres and S3-compatible storage that come up with the dev server rather than after it.
 - Database migrations, applied automatically before the server starts.
