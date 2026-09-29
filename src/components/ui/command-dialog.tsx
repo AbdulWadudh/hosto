@@ -84,19 +84,14 @@ export function CommandDialog({
           <div className="px-4 py-3">{children}</div>
         </ScrollArea>
 
-        <footer
-          className={cn(
-            "sticky bottom-0 z-10 flex flex-wrap items-center justify-end gap-2 border-t bg-card/95 px-4 py-2.5 backdrop-blur",
-            !footer && "sm:hidden"
-          )}
-        >
+        <footer className="sticky bottom-0 z-10 flex flex-wrap items-center justify-end gap-2 border-t bg-card/95 px-4 py-2.5 backdrop-blur">
           {footer}
           <DialogClose
             render={
               <Button
                 type="button"
                 variant="ghost"
-                className="order-last shrink-0 text-muted-foreground hover:text-foreground sm:hidden"
+                className="order-last shrink-0 text-muted-foreground hover:text-foreground"
               >
                 <HugeiconsIcon icon={Cancel01Icon} size={14} />
                 Close
