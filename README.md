@@ -45,7 +45,7 @@ Requires [Bun](https://bun.sh) and Docker.
 ```bash
 bun install
 cp .env.example .env     # fill in the Google OAuth pair when you need social sign-in
-bun run db:push          # creates the schema and the raw SQL constraints
+bun run db:deploy        # applies migrations, constraints and triggers
 bun run dev              # brings Docker up, waits for health, then starts Next
 ```
 
@@ -74,15 +74,27 @@ profile. It is idempotent and runs on every `services:up`.
 | `bun run lint` / `format` | Biome |
 | `bun run typecheck` | `tsc --noEmit` |
 | `bun run services:up` / `services:down` | Docker stack only |
-| `bun run db:push` | Sync schema, then re-apply `prisma/sql/constraints.sql` |
+| `bun run db:migrate` | Create and apply a migration after a schema change |
+| `bun run db:deploy` | Apply pending migrations (what `start` runs) |
+| `bun run db:status` | Show which migrations are applied |
 | `bun run db:check` | Prove the reservation constraints against the live database |
 | `bun run db:studio` | Prisma Studio |
 
-### Why `db:push` has a second half
+### Migrations run before the server does
 
-`prisma db push` cannot express an exclusion constraint and will not preserve one, so the
-raw SQL in `prisma/sql/constraints.sql` is re-applied after every push. It is written to
-be idempotent. Never run `prisma db push` directly — use the script.
+`bun run start` is `prisma migrate deploy && next start`. Production cannot come up
+against a schema that has not caught up.
+
+`migrate deploy` runs **only** files under `prisma/migrations/`. The exclusion constraint,
+the CHECKs and the freeze-past trigger are therefore written into the migration itself,
+not kept in a side-car SQL file that deployment would ignore.
+
+That has a consequence worth remembering: `prisma migrate dev` writes the table diff and
+nothing more. **If you change a constraint or a trigger, append the SQL to the generated
+migration by hand.**
+
+`prisma` and `dotenv` are runtime dependencies rather than devDependencies, because
+`start` shells out to the Prisma CLI and `prisma.config.ts` imports `dotenv`.
 
 ## Domain rules worth knowing
 

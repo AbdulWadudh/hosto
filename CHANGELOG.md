@@ -18,6 +18,7 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - A password field you can reveal, so you can check what you typed before submitting.
 - A landing page, plus the Terms and Privacy pages Google asks for before it will verify sign-in.
 - Postgres and S3-compatible storage that come up with the dev server rather than after it.
+- Database migrations, applied automatically before the server starts.
 
 ### Changed
 

@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "bun run services:up && next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "prisma migrate deploy && next start",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
     "services:up": "docker compose up -d --wait && docker compose run --rm rustfs-bucket",
     "services:down": "docker compose down",
-    "db:push": "prisma db push && prisma db execute --file prisma/sql/constraints.sql",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
     "db:check": "bun prisma/overlap.check.ts",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
@@ -27,9 +29,11 @@
     "better-auth": "^1.7.6",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
+    "dotenv": "^17",
     "motion": "^13.4.6",
     "next": "16.3.4",
     "next-themes": "^0.4.6",
+    "prisma": "^7",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "shadcn": "^4.21.0",
@@ -42,8 +46,6 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "dotenv": "^18.0.4",
-    "prisma": "^7",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

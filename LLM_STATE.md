@@ -17,15 +17,28 @@ All application source lives under `src/`. `@/*` resolves to `src/*`.
 Domain models (`Property`, `Reservation`) use `@default(cuid())`. Better Auth issues its
 own IDs for `User`/`Session`/`Account`/`Verification`; those are left alone.
 
-### D2 — `db push` now, migrations later
+### D2 - Migrations, applied before the server starts
 
-Development uses `prisma db push`. No migration history is tracked yet.
+Migrations are tracked in `prisma/migrations/`. `bun run start` is
+`prisma migrate deploy && next start`, so production can never serve against a schema
+that has not caught up.
 
-**When the schema stabilises**, switch over: delete the dev volume, run
-`prisma migrate dev --name init` to capture the whole schema as migration one, then fold
-`prisma/sql/constraints.sql` into that migration and drop it from the `db:push` script.
-Until then `bun run db:push` re-applies the raw SQL after every push, because `db push`
-cannot express an exclusion constraint and will not preserve one.
+`20260930000000_init` is the baseline, generated with `migrate diff --from-empty` and
+then **hand-extended with the constraints Prisma cannot express**: `btree_gist`, the
+exclusion constraint, both CHECKs, and the freeze-past trigger. This matters more than it
+looks: `migrate deploy` runs only files under `prisma/migrations/`, so anything left in a
+side-car SQL file would simply never reach production. `prisma/sql/constraints.sql` has
+been deleted for that reason — a second copy is a copy that goes stale.
+
+**Every future migration that touches a constraint or trigger must carry the SQL itself.**
+`prisma migrate dev` writes the table diff and nothing else; append the rest by hand.
+
+`prisma` and `dotenv` are runtime **dependencies**, not devDependencies. `start` shells out
+to the Prisma CLI and `prisma.config.ts` imports `dotenv`, so a production install that
+skips devDependencies would fail at boot.
+
+Resetting to a clean history later is still fine: drop `prisma/migrations/`, drop the dev
+volume, and regenerate a single baseline the same way.
 
 ### D3 - Requests are free; approval is what locks
 
