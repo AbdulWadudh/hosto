@@ -115,21 +115,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-heading font-semibold text-3xl tracking-[-0.02em]">
-            Hello, {firstNameOf(user.name)}
-          </h1>
-          <p className="mt-2 text-muted-foreground">{greeting}</p>
-        </div>
-        {owned.length > 0 && (
-          <Button
-            render={<Link href="/dashboard/properties/new" />}
-            nativeButton={false}
-          >
-            Add a property
-          </Button>
-        )}
+      <header>
+        <h1 className="font-heading font-semibold text-3xl tracking-[-0.02em]">
+          Hello, {firstNameOf(user.name)}
+        </h1>
+        <p className="mt-2 text-muted-foreground">{greeting}</p>
       </header>
 
       {owned.length > 0 && (

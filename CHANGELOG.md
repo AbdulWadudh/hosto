@@ -30,6 +30,8 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Asking for dates on the calendar itself: click or drag across the nights you want.
   Click inside a chosen range to shorten it, and a floating chip shows the range with
   a way to clear it.
+- Adding a property lives in the profile menu once you have one, rather than sitting in
+  the dashboard header as well.
 - Owners edit the name, address, description and how many the place sleeps, and can
   type a capacity rather than only stepping to it.
 - A settings screen per property, including whether it is taking requests at all.
@@ -62,6 +64,11 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 ### Fixed
 
 - Property photographs show up instead of a broken image.
+- The profile menu opens on a phone. It was a hover card, and a tap on a device with no
+  hover just followed the link underneath it to the dashboard. It opens on a tap now and
+  still opens on hover with a pointer.
+- Every action in the profile menu carries a word, not a house icon that could equally
+  have meant "home".
 - Clicking anywhere on the dashboard no longer opens a property. The card's link was
   stretching to the whole page rather than to the card, so every patch of empty space
   was a click target.
