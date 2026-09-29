@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { dayLabel } from "@/lib/calendar/month"
 import {
   type ReservationView,
+  reservationStatusLabel,
   reserverName,
 } from "@/lib/properties/reservationView"
 import { cn } from "@/lib/utils"
@@ -43,7 +44,8 @@ export function ReservationList({
             onClick={() => onPick(reservation.id)}
             className={cn(
               "flex w-full items-center gap-3 rounded-(--radius-lg) px-2 py-2 text-left transition-colors hover:bg-muted/40",
-              focusedId === reservation.id && "bg-muted/60"
+              focusedId === reservation.id && "bg-muted/60",
+              reservation.status === "REJECTED" && "opacity-60"
             )}
           >
             {reservation.visibility === "identified" ? (
@@ -74,10 +76,10 @@ export function ReservationList({
 
             <Badge
               variant={
-                reservation.status === "PENDING" ? "secondary" : "default"
+                reservation.status === "CONFIRMED" ? "default" : "secondary"
               }
             >
-              {reservation.status === "PENDING" ? "Waiting" : "Booked"}
+              {reservationStatusLabel(reservation)}
             </Badge>
           </button>
         </li>

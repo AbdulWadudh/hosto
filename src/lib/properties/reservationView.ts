@@ -88,5 +88,11 @@ export function reservationStatusLabel(reservation: ReservationView): string {
   if (reservation.status === "PENDING") {
     return reservation.isYours ? "Waiting on the owner" : "Waiting"
   }
+  if (reservation.status === "REJECTED") {
+    return "Turned down"
+  }
+  if (reservation.status === "CANCELLED") {
+    return "Cancelled"
+  }
   return reservation.visibility === "identified" ? "Booked" : "Reserved"
 }

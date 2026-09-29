@@ -65,22 +65,26 @@ export function dayLabel(date: Date): string {
 export function timeOfDay(date: Date): string {
   const hour = date.getHours()
   if (hour < 5) {
-    return "night"
+    return "Night"
   }
   if (hour < 12) {
-    return "morning"
+    return "Morning"
   }
   if (hour < 17) {
-    return "afternoon"
+    return "Afternoon"
   }
   if (hour < 21) {
-    return "evening"
+    return "Evening"
   }
-  return "night"
+  return "Night"
 }
 
 export function momentLabel(date: Date): string {
   return `${dayLabel(date)}, ${timeOfDay(date)}`
+}
+
+export function holdsDates(span: Span): boolean {
+  return span.status === "CONFIRMED" || span.status === "RESERVED"
 }
 
 export function rangeHasConflict(from: Date, to: Date, spans: Span[]): boolean {
@@ -88,9 +92,7 @@ export function rangeHasConflict(from: Date, to: Date, spans: Span[]): boolean {
   const start = startOfDay(from)
   return spans.some(
     (span) =>
-      span.status !== "PENDING" &&
-      span.checkIn < end &&
-      span.blockedUntil > start
+      holdsDates(span) && span.checkIn < end && span.blockedUntil > start
   )
 }
 
@@ -155,7 +157,10 @@ export function buildMonth(
   const gridStart = addDays(startOfDay(first), -leading)
   const todayTime = today ? startOfDay(today).getTime() : null
 
-  const confirmed = spans.filter((span) => span.status !== "PENDING")
+  const live = spans.filter(
+    (span) => holdsDates(span) || span.status === "PENDING"
+  )
+  const confirmed = live.filter(holdsDates)
   const isDayVisit = (span: Span) =>
     startOfDay(span.checkIn).getTime() === startOfDay(span.checkOut).getTime()
   const holdsNight = (span: Span, day: Date) =>
@@ -169,14 +174,12 @@ export function buildMonth(
     const date = addDays(gridStart, index)
 
     const night =
-      spans.find(
-        (span) => span.status !== "PENDING" && holdsNight(span, date)
-      ) ??
-      spans.find((span) => holdsNight(span, date)) ??
+      confirmed.find((span) => holdsNight(span, date)) ??
+      live.find((span) => holdsNight(span, date)) ??
       null
     const leaving = night
       ? null
-      : (spans.find((span) => leaves(span, date)) ?? null)
+      : (live.find((span) => leaves(span, date)) ?? null)
 
     const inBuffer = confirmed.some(
       (span) =>
@@ -191,7 +194,7 @@ export function buildMonth(
       inMonth: date.getMonth() === month,
       isToday: todayTime !== null && date.getTime() === todayTime,
       isPast: todayTime !== null && date.getTime() < todayTime,
-      occupied: night !== null && night.status !== "PENDING",
+      occupied: night !== null && holdsDates(night),
       pending: night !== null && night.status === "PENDING",
       inBuffer,
       isLeavingDay: leaving !== null,

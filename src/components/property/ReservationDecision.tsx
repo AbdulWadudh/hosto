@@ -9,10 +9,10 @@ import {
 
 export function ReservationDecision({
   reservationId,
-  isPendingRequest,
+  status,
 }: {
   reservationId: string
-  isPendingRequest: boolean
+  status: string
 }) {
   const [state, action, isSaving] = useActionState<DecisionState, FormData>(
     decideReservation,
@@ -32,25 +32,31 @@ export function ReservationDecision({
 
       <input type="hidden" name="reservationId" value={reservationId} />
 
-      <Button
-        type="submit"
-        name="decision"
-        value="reject"
-        variant="outline"
-        disabled={isSaving}
-        className="text-destructive"
-      >
-        {isPendingRequest ? "Reject" : "Revoke"}
-      </Button>
+      {status !== "REJECTED" && (
+        <Button
+          type="submit"
+          name="decision"
+          value="reject"
+          variant="outline"
+          disabled={isSaving}
+          className="text-destructive"
+        >
+          {status === "PENDING" ? "Reject" : "Revoke"}
+        </Button>
+      )}
 
-      {isPendingRequest && (
+      {status !== "CONFIRMED" && (
         <Button
           type="submit"
           name="decision"
           value="approve"
           disabled={isSaving}
         >
-          {isSaving ? "Saving..." : "Approve"}
+          {isSaving
+            ? "Saving..."
+            : status === "REJECTED"
+              ? "Approve after all"
+              : "Approve"}
         </Button>
       )}
     </form>

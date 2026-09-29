@@ -76,7 +76,10 @@ export default async function DashboardPage() {
         select: cardFields,
       }),
       prisma.reservation.findMany({
-        where: { guestId: user.id, status: { in: ["PENDING", "CONFIRMED"] } },
+        where: {
+          guestId: user.id,
+          status: { in: ["PENDING", "CONFIRMED", "REJECTED"] },
+        },
         orderBy: { checkIn: "asc" },
         take: 10,
         select: {

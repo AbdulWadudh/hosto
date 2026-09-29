@@ -53,7 +53,7 @@ export function ReservationDialog({
         reservation && canDecide ? (
           <ReservationDecision
             reservationId={reservation.id}
-            isPendingRequest={reservation.status === "PENDING"}
+            status={reservation.status}
           />
         ) : undefined
       }
