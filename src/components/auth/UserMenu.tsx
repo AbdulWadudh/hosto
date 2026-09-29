@@ -1,8 +1,8 @@
 "use client"
 
 import {
+  Add01Icon,
   DashboardSquare01Icon,
-  Home09Icon,
   Logout01Icon,
   ShieldKeyIcon,
 } from "@hugeicons/core-free-icons"
@@ -13,10 +13,11 @@ import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 
 export type SessionUser = {
@@ -60,15 +61,12 @@ export function UserMenu({ user }: { user: SessionUser }) {
   }
 
   return (
-    <HoverCard>
-      <HoverCardTrigger
-        render={
-          <Link
-            href="/dashboard"
-            aria-label={`${user.name}. Go to dashboard`}
-            className="block rounded-full outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        }
+    <Popover>
+      <PopoverTrigger
+        openOnHover
+        delay={120}
+        aria-label={`${user.name}. Open your menu`}
+        className="block rounded-full outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Avatar className="size-8 border transition-transform hover:scale-105">
           {user.image && <AvatarImage src={user.image} alt="" />}
@@ -76,9 +74,9 @@ export function UserMenu({ user }: { user: SessionUser }) {
             {initialsOf(user.name)}
           </AvatarFallback>
         </Avatar>
-      </HoverCardTrigger>
+      </PopoverTrigger>
 
-      <HoverCardContent align="end" className="w-72 p-0">
+      <PopoverContent align="end" className="w-72 p-0">
         <div className="flex items-start gap-3 p-4">
           <Avatar className="size-11 border">
             {user.image && <AvatarImage src={user.image} alt="" />}
@@ -111,40 +109,51 @@ export function UserMenu({ user }: { user: SessionUser }) {
 
         <Separator />
 
-        <div className="flex items-center gap-2 p-2">
-          <Button
-            render={<Link href="/dashboard" />}
+        <div className="flex flex-col gap-2 p-2">
+          <PopoverClose
             nativeButton={false}
-            size="sm"
-            className="flex-1"
-          >
-            <HugeiconsIcon icon={DashboardSquare01Icon} size={14} />
-            Dashboard
-          </Button>
-          <Button
-            render={<Link href="/dashboard/properties/new" />}
-            nativeButton={false}
-            variant="outline"
-            size="icon-sm"
-            aria-label="Add a property"
-            title="Add a property"
-          >
-            <HugeiconsIcon icon={Home09Icon} size={15} />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Sign out"
-            title="Sign out"
-            disabled={isSigningOut}
-            onClick={signOut}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <HugeiconsIcon icon={Logout01Icon} size={16} />
-          </Button>
+            render={
+              <Button
+                render={<Link href="/dashboard" />}
+                nativeButton={false}
+                size="sm"
+              >
+                <HugeiconsIcon icon={DashboardSquare01Icon} size={14} />
+                Dashboard
+              </Button>
+            }
+          />
+
+          <div className="flex items-center gap-2">
+            <PopoverClose
+              nativeButton={false}
+              render={
+                <Button
+                  render={<Link href="/dashboard/properties/new" />}
+                  nativeButton={false}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                >
+                  <HugeiconsIcon icon={Add01Icon} size={14} />
+                  Add a property
+                </Button>
+              }
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isSigningOut}
+              onClick={signOut}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <HugeiconsIcon icon={Logout01Icon} size={14} />
+              Sign out
+            </Button>
+          </div>
         </div>
-      </HoverCardContent>
-    </HoverCard>
+      </PopoverContent>
+    </Popover>
   )
 }
