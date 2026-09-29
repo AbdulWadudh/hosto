@@ -123,10 +123,10 @@ export function MonthCalendar({
     if (!selection?.from) {
       return false
     }
-    if (!selection.to || selection.to.getTime() === selection.from.getTime()) {
+    if (!selection.to) {
       return date.getTime() === selection.from.getTime()
     }
-    return date >= selection.from && date < selection.to
+    return date >= selection.from && date <= selection.to
   }
 
   return (
