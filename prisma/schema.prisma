@@ -1,0 +1,132 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  runtime      = "nodejs"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
+model Property {
+  id                    String        @id @default(cuid())
+  slug                  String        @unique
+  title                 String
+  address               String
+  description           String
+  imageUrls             String[]
+  pricingEnabled        Boolean       @default(true)
+  nightlyPrice          Decimal?      @db.Decimal(10, 2)
+  currency              String        @default("INR") @db.Char(3)
+  maxGuests             Int
+  turnoverBufferMinutes Int           @default(240)
+  showReserverIdentity  Boolean       @default(false)
+  ownerId               String
+  owner                 User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  reservations          Reservation[]
+  createdAt             DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime      @updatedAt @db.Timestamptz(3)
+
+  @@index([ownerId])
+  @@map("property")
+}
+
+model Reservation {
+  id           String            @id @default(cuid())
+  propertyId   String
+  property     Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  guestId      String
+  guest        User              @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  checkIn      DateTime          @db.Timestamptz(3)
+  checkOut     DateTime          @db.Timestamptz(3)
+  blockedUntil DateTime          @db.Timestamptz(3)
+  status       ReservationStatus @default(PENDING)
+  totalPrice   Decimal?          @db.Decimal(10, 2)
+  currency     String            @default("INR") @db.Char(3)
+  notes        String?
+  createdAt    DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime          @updatedAt @db.Timestamptz(3)
+
+  @@index([propertyId, checkIn])
+  @@index([propertyId, status])
+  @@index([guestId])
+  @@map("reservation")
+}
+
+model User {
+  id              String        @id
+  name            String
+  email           String
+  emailVerified   Boolean       @default(false)
+  image           String?
+  createdAt       DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime      @updatedAt @db.Timestamptz(3)
+  role            String?
+  banned          Boolean?      @default(false)
+  banReason       String?
+  banExpires      DateTime?     @db.Timestamptz(3)
+  sessions        Session[]
+  accounts        Account[]
+  ownedProperties Property[]
+  reservations    Reservation[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime @db.Timestamptz(3)
+  token          String
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@map("verification")
+}
