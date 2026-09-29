@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { PropertyView } from "@/components/property"
 import { getPropertyBySlug } from "@/lib/properties/getProperty"
+import { getSession } from "@/lib/session"
 
 type Params = { params: Promise<{ slug: string }> }
 
@@ -21,11 +22,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function PropertyPage({ params }: Params) {
   const { slug } = await params
-  const property = await getPropertyBySlug(slug)
+  const [property, session] = await Promise.all([
+    getPropertyBySlug(slug),
+    getSession(),
+  ])
 
   if (!property) {
     notFound()
   }
 
-  return <PropertyView property={property} />
+  return <PropertyView property={property} isSignedIn={session !== null} />
 }

@@ -4,6 +4,7 @@ export type DayState = {
   day: number
   inMonth: boolean
   isToday: boolean
+  isPast: boolean
   occupied: boolean
   inBuffer: boolean
   pending: boolean
@@ -47,6 +48,16 @@ export function monthLabel(year: number, month: number): string {
 
 export function dayLabel(date: Date): string {
   return dayFormat.format(date)
+}
+
+export function nightsBetween(from: Date, to: Date): number {
+  return Math.max(0, Math.round((to.getTime() - from.getTime()) / dayMs))
+}
+
+export function toDateInput(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${date.getFullYear()}-${month}-${day}`
 }
 
 function overlapsDay(from: Date, to: Date, day: Date): boolean {
@@ -96,6 +107,7 @@ export function buildMonth(
       day: date.getDate(),
       inMonth: date.getMonth() === month,
       isToday: todayTime !== null && date.getTime() === todayTime,
+      isPast: todayTime !== null && date.getTime() < todayTime,
       occupied,
       inBuffer,
       pending,

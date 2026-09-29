@@ -56,7 +56,13 @@ export function directionsUrl(property: {
   return `https://www.google.com/maps/dir/?${params.toString()}`
 }
 
-export function PropertyCard({ property }: { property: PropertySummary }) {
+export function PropertyCard({
+  property,
+  manageHref,
+}: {
+  property: PropertySummary
+  manageHref?: string
+}) {
   return (
     <Card className="group flex flex-col overflow-hidden p-0">
       <Link
@@ -126,17 +132,19 @@ export function PropertyCard({ property }: { property: PropertySummary }) {
             >
               <HugeiconsIcon icon={Navigation03Icon} size={15} />
             </Button>
-            <Button
-              render={<Link href={`/dashboard/properties/${property.id}`} />}
-              nativeButton={false}
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Settings for ${property.title}`}
-              title="Settings"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <HugeiconsIcon icon={Settings02Icon} size={15} />
-            </Button>
+            {manageHref && (
+              <Button
+                render={<Link href={manageHref} />}
+                nativeButton={false}
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Settings for ${property.title}`}
+                title="Settings"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <HugeiconsIcon icon={Settings02Icon} size={15} />
+              </Button>
+            )}
           </span>
         </div>
       </div>

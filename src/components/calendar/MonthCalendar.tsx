@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   buildMonth,
+  type DayState,
   dayLabel,
   monthLabel,
   type Span,
@@ -23,14 +24,37 @@ const weekdays = [
   { id: "sun", label: "S" },
 ]
 
+export type Selection = { from: Date | null; to: Date | null }
+
+export function isSelectable(day: DayState): boolean {
+  return !day.occupied && !day.inBuffer && !day.isPast
+}
+
+function describe(day: DayState): string {
+  if (day.occupied) {
+    return "Booked"
+  }
+  if (day.inBuffer) {
+    return "Turnover"
+  }
+  if (day.pending) {
+    return "Requested"
+  }
+  return "Free"
+}
+
 export function MonthCalendar({
   spans,
   initialYear,
   initialMonth,
+  selection,
+  onSelectDay,
 }: {
   spans: Span[]
   initialYear: number
   initialMonth: number
+  selection?: Selection
+  onSelectDay?: (date: Date) => void
 }) {
   const [cursor, setCursor] = useState({
     year: initialYear,
@@ -51,6 +75,14 @@ export function MonthCalendar({
   const shift = (by: number) => {
     const next = new Date(cursor.year, cursor.month + by, 1)
     setCursor({ year: next.getFullYear(), month: next.getMonth() })
+  }
+
+  const inRange = (date: Date) => {
+    if (!selection?.from) {
+      return false
+    }
+    const end = selection.to ?? selection.from
+    return date >= selection.from && date <= end
   }
 
   return (
@@ -101,50 +133,79 @@ export function MonthCalendar({
       >
         {days.map((day) => {
           const split = day.isDeparture && day.inBuffer
-          const label = day.occupied
-            ? "Booked"
-            : day.inBuffer
-              ? "Turnover"
-              : day.pending
-                ? "Requested"
-                : "Free"
+          const label = describe(day)
+          const picked = inRange(day.date)
+          const canPick =
+            Boolean(onSelectDay) && isSelectable(day) && day.inMonth
+          const title = `${dayLabel(day.date)} - ${label}`
 
-          return (
-            <div
-              key={day.key}
-              title={`${dayLabel(day.date)} - ${label}`}
+          const surface = cn(
+            "relative aspect-square w-full overflow-hidden rounded-(--radius-sm) border text-[0.65rem] transition-colors",
+            day.inMonth ? "border-border/60" : "border-transparent opacity-35",
+            picked &&
+              "bg-primary/85 text-primary-foreground ring-2 ring-primary",
+            !picked &&
+              day.occupied &&
+              !split &&
+              "bg-primary text-primary-foreground",
+            !picked &&
+              !day.occupied &&
+              day.inBuffer &&
+              !split &&
+              "bg-muted-foreground/30",
+            !picked &&
+              !day.occupied &&
+              !day.inBuffer &&
+              day.pending &&
+              "border-primary/40 border-dashed bg-primary/10",
+            !picked &&
+              !day.occupied &&
+              !day.inBuffer &&
+              !day.pending &&
+              "bg-muted/25",
+            canPick && !picked && "hover:border-primary hover:bg-primary/15"
+          )
+
+          const number = (
+            <span
               className={cn(
-                "relative aspect-square overflow-hidden rounded-(--radius-sm) border text-[0.65rem]",
-                day.inMonth
-                  ? "border-border/60"
-                  : "border-transparent opacity-35",
-                day.occupied && !split && "bg-primary text-primary-foreground",
-                !day.occupied &&
-                  day.inBuffer &&
-                  !split &&
-                  "bg-muted-foreground/30",
-                !day.occupied &&
-                  !day.inBuffer &&
-                  day.pending &&
-                  "border-primary/40 border-dashed bg-primary/10",
-                !day.occupied && !day.inBuffer && !day.pending && "bg-muted/25"
+                "absolute top-0.5 left-1 font-mono",
+                day.isToday && "underline underline-offset-2",
+                day.occupied || split || picked
+                  ? "text-primary-foreground"
+                  : "text-muted-foreground"
               )}
             >
-              {split && (
-                <span className="absolute inset-0 bg-[linear-gradient(135deg,var(--color-primary)_0_49.4%,transparent_49.4%_50.6%,var(--color-muted-foreground)_50.6%_100%)] opacity-90" />
-              )}
-              <span
-                className={cn(
-                  "absolute top-0.5 left-1 font-mono",
-                  day.isToday && "underline underline-offset-2",
-                  day.occupied || split
-                    ? "text-primary-foreground"
-                    : "text-muted-foreground"
-                )}
-              >
-                {day.day}
-              </span>
-            </div>
+              {day.day}
+            </span>
+          )
+
+          const splitOverlay = split && (
+            <span className="absolute inset-0 bg-[linear-gradient(135deg,var(--color-primary)_0_49.4%,transparent_49.4%_50.6%,var(--color-muted-foreground)_50.6%_100%)] opacity-90" />
+          )
+
+          if (!canPick) {
+            return (
+              <div key={day.key} title={title} className={surface}>
+                {splitOverlay}
+                {number}
+              </div>
+            )
+          }
+
+          return (
+            <button
+              key={day.key}
+              type="button"
+              title={title}
+              aria-label={`${dayLabel(day.date)}, ${label}`}
+              aria-pressed={picked}
+              onClick={() => onSelectDay?.(day.date)}
+              className={surface}
+            >
+              {splitOverlay}
+              {number}
+            </button>
           )
         })}
       </motion.div>

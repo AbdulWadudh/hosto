@@ -4,13 +4,19 @@ import { motion, useScroll, useTransform } from "motion/react"
 import Image from "next/image"
 import Link from "next/link"
 
-const links = [
+export const landingLinks = [
   { href: "#occupancy", label: "Calendar" },
   { href: "#turnover", label: "Turnover" },
   { href: "#privacy", label: "Privacy" },
 ]
 
-export function SiteNav({ children }: { children?: React.ReactNode }) {
+export function SiteNav({
+  children,
+  links = [],
+}: {
+  children?: React.ReactNode
+  links?: { href: string; label: string }[]
+}) {
   const { scrollY } = useScroll()
   const blur = useTransform(scrollY, [0, 120], [6, 18])
   const border = useTransform(

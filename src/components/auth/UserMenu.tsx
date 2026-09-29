@@ -2,6 +2,7 @@
 
 import {
   DashboardSquare01Icon,
+  Home09Icon,
   Logout01Icon,
   ShieldKeyIcon,
 } from "@hugeicons/core-free-icons"
@@ -119,6 +120,16 @@ export function UserMenu({ user }: { user: SessionUser }) {
           >
             <HugeiconsIcon icon={DashboardSquare01Icon} size={14} />
             Dashboard
+          </Button>
+          <Button
+            render={<Link href="/dashboard/properties/new" />}
+            nativeButton={false}
+            variant="outline"
+            size="icon-sm"
+            aria-label="Add a property"
+            title="Add a property"
+          >
+            <HugeiconsIcon icon={Home09Icon} size={15} />
           </Button>
           <Button
             type="button"
