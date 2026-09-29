@@ -37,6 +37,9 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   approved. Only for dates that have not yet passed.
 - Picking a stay from the list marks it on the calendar and turns to the month it falls
   in, so you can see a stay rather than read its dates.
+- Every day of a stay carries the name of whoever has it, and clicking a taken day opens
+  that reservation. Names appear only where they would appear anywhere else; a property
+  that keeps them private stays private on the grid too.
 - A landing page, plus the Terms and Privacy pages Google asks for before it will verify sign-in.
 - Postgres and S3-compatible storage that come up with the dev server rather than after it.
 - Database migrations, applied automatically before the server starts.
@@ -62,10 +65,15 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Picking a single day shows as selected instead of leaving the calendar blank.
 - Your own request is visible to you the moment you send it, so you can see what dates
   you asked for. Everyone else still sees nothing until the owner approves it.
-- Dates read as 03-Oct-2026 everywhere, and a time says which part of the day it is:
-  "03-Oct-2026, night 22:00" rather than "03/10/2026, 22:00:00".
-- On a phone, a dialog's close sits at the bottom right, within reach of a thumb,
-  rather than at the top corner of a panel that starts halfway down the screen.
+- Dates read as 03-Oct-2026 everywhere, and a time says which part of the day it is —
+  "03-Oct-2026, night" — since nobody picks a clock time, only a part of the day.
+- A stay no longer claims to be held until a date nobody chose. The turnover window is
+  stated as what it is: four hours after they leave.
+- The day someone leaves is drawn as part of their stay rather than as anonymous
+  turnover, so a stay from the third to the fourth marks both days.
+- On a phone, a dialog sits at the bottom of the screen with room around it and its
+  close at the bottom right, within reach of a thumb, instead of floating in the middle
+  with its close in the far corner.
 
 - Deployments no longer start against a database that was never migrated. On hosts that
   build and serve separately, the migration step was being skipped entirely.
