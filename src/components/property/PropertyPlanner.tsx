@@ -3,10 +3,14 @@
 import type { ReactNode } from "react"
 import { useState } from "react"
 import { AvailabilityBooking } from "@/components/property/AvailabilityBooking"
+import { ReservationDialog } from "@/components/property/ReservationDialog"
 import { ReservationList } from "@/components/property/ReservationList"
 import { Card } from "@/components/ui/card"
 import type { Span } from "@/lib/calendar/month"
-import type { ReservationView } from "@/lib/properties/reservationView"
+import {
+  type ReservationView,
+  reserverName,
+} from "@/lib/properties/reservationView"
 
 export function PropertyPlanner({
   slug,
@@ -28,9 +32,22 @@ export function PropertyPlanner({
   availability: ReactNode
 }) {
   const [focusedId, setFocusedId] = useState<string | null>(null)
-  const focused = reservations.find((one) => one.id === focusedId) ?? null
+  const [openId, setOpenId] = useState<string | null>(null)
+
+  const find = (id: string | null) =>
+    reservations.find((one) => one.id === id) ?? null
+
+  const pick = (id: string) => {
+    setFocusedId(id)
+    setOpenId(id)
+  }
 
   const spans: Span[] = reservations.map((reservation) => ({
+    id: reservation.id,
+    label:
+      reservation.visibility === "identified"
+        ? reserverName(reservation)
+        : null,
     checkIn: reservation.checkIn,
     checkOut: reservation.checkOut,
     blockedUntil: reservation.blockedUntil,
@@ -46,7 +63,8 @@ export function PropertyPlanner({
         initialMonth={initialMonth}
         canBook={canBook}
         isOwner={isOwner}
-        highlight={focused}
+        highlight={find(focusedId)}
+        onSpanPick={pick}
       />
 
       <aside className="space-y-4">
@@ -64,13 +82,18 @@ export function PropertyPlanner({
           <div className="mt-3">
             <ReservationList
               reservations={reservations}
-              canDecide={canManage}
               focusedId={focusedId}
-              onFocus={setFocusedId}
+              onPick={pick}
             />
           </div>
         </Card>
       </aside>
+
+      <ReservationDialog
+        reservation={find(openId)}
+        canDecide={canManage}
+        onClose={() => setOpenId(null)}
+      />
     </div>
   )
 }

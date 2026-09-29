@@ -33,6 +33,7 @@ export function AvailabilityBooking({
   canBook,
   isOwner,
   highlight,
+  onSpanPick,
 }: {
   slug: string
   spans: Span[]
@@ -41,6 +42,7 @@ export function AvailabilityBooking({
   canBook: boolean
   isOwner: boolean
   highlight?: { checkIn: Date; checkOut: Date } | null
+  onSpanPick?: (id: string) => void
 }) {
   const [selection, setSelection] = useState<Selection>({
     from: null,
@@ -162,6 +164,7 @@ export function AvailabilityBooking({
         initialYear={initialYear}
         initialMonth={initialMonth}
         highlight={highlight}
+        onSpanPick={onSpanPick}
         selection={canBook ? selection : undefined}
         onDayDown={canBook ? beginAt : undefined}
         onDayEnter={canBook ? extendTo : undefined}

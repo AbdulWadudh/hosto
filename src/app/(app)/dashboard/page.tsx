@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { EmptyState, PropertyCard } from "@/components/dashboard"
-import { ReservationList } from "@/components/property"
+import { ReservationBrowser } from "@/components/property"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
@@ -147,7 +147,7 @@ export default async function DashboardPage() {
         <section className="mt-10">
           <h2 className="font-medium text-sm">Your stays</h2>
           <Card className="mt-4 p-5">
-            <ReservationList
+            <ReservationBrowser
               reservations={myReservations.map((reservation) => ({
                 visibility: "identified" as const,
                 id: reservation.id,

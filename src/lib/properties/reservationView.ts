@@ -74,3 +74,19 @@ export function projectReservation(
     isYours: false,
   }
 }
+
+export function reserverName(reservation: ReservationView): string {
+  if (reservation.isYours) {
+    return "You"
+  }
+  return reservation.visibility === "identified"
+    ? reservation.reserver.name
+    : "Reserved"
+}
+
+export function reservationStatusLabel(reservation: ReservationView): string {
+  if (reservation.status === "PENDING") {
+    return reservation.isYours ? "Waiting on the owner" : "Waiting"
+  }
+  return reservation.visibility === "identified" ? "Booked" : "Reserved"
+}
