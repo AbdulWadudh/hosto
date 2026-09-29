@@ -7,10 +7,12 @@ import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   buildMonth,
+  coversDay,
   type DayState,
   dayLabel,
   monthLabel,
   type Span,
+  startOfDay,
 } from "@/lib/calendar/month"
 import { cn } from "@/lib/utils"
 
@@ -51,6 +53,7 @@ export function MonthCalendar({
   initialYear,
   initialMonth,
   selection,
+  highlight,
   onDayDown,
   onDayEnter,
 }: {
@@ -58,6 +61,7 @@ export function MonthCalendar({
   initialYear: number
   initialMonth: number
   selection?: Selection
+  highlight?: { checkIn: Date; checkOut: Date } | null
   onDayDown?: (date: Date) => void
   onDayEnter?: (date: Date) => void
 }) {
@@ -71,6 +75,18 @@ export function MonthCalendar({
   useEffect(() => {
     setToday(new Date())
   }, [])
+
+  const highlightStart = highlight
+    ? startOfDay(highlight.checkIn).getTime()
+    : null
+
+  useEffect(() => {
+    if (highlightStart === null) {
+      return
+    }
+    const target = new Date(highlightStart)
+    setCursor({ year: target.getFullYear(), month: target.getMonth() })
+  }, [highlightStart])
 
   const days = useMemo(
     () => buildMonth(cursor.year, cursor.month, spans, today),
@@ -149,6 +165,9 @@ export function MonthCalendar({
             selection.to.getTime() !== selection.from?.getTime() &&
             sameDay(day.date, selection.to)
           const canPick = Boolean(onDayDown) && isSelectable(day)
+          const highlighted = Boolean(
+            highlight && coversDay(highlight, day.date)
+          )
           const title = `${dayLabel(day.date)} - ${label}`
 
           const surface = cn(
@@ -185,7 +204,9 @@ export function MonthCalendar({
               !day.pending &&
               !day.isPast &&
               "bg-background",
-            canPick && !picked && "hover:border-primary hover:bg-primary/15"
+            canPick && !picked && "hover:border-primary hover:bg-primary/15",
+            highlighted &&
+              "z-10 ring-2 ring-foreground/70 ring-offset-1 ring-offset-card"
           )
 
           const number = (

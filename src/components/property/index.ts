@@ -1,5 +1,6 @@
 export { AvailabilityBooking } from "@/components/property/AvailabilityBooking"
 export { PropertyGallery } from "@/components/property/PropertyGallery"
+export { PropertyPlanner } from "@/components/property/PropertyPlanner"
 export { ReservationList } from "@/components/property/ReservationList"
 export { PropertyView } from "@/components/property/PropertyView"
 export { type Choice, TimeChoice } from "@/components/property/TimeChoice"

@@ -7,9 +7,8 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import Image from "next/image"
 import Link from "next/link"
 import { describeBuffer, directionsUrl } from "@/components/dashboard"
-import { AvailabilityBooking } from "@/components/property/AvailabilityBooking"
 import { PropertyGallery } from "@/components/property/PropertyGallery"
-import { ReservationList } from "@/components/property/ReservationList"
+import { PropertyPlanner } from "@/components/property/PropertyPlanner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -23,13 +22,6 @@ export function PropertyView({
   isSignedIn: boolean
 }) {
   const now = new Date()
-  const spans = property.reservations.map((reservation) => ({
-    checkIn: reservation.checkIn,
-    checkOut: reservation.checkOut,
-    blockedUntil: reservation.blockedUntil,
-    status: reservation.status,
-  }))
-
   const canBook = isSignedIn && (property.isBookable || property.isOwner)
   const cover = property.imageUrls[0] ?? null
 
@@ -111,17 +103,15 @@ export function PropertyView({
         )}
       </section>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
-        <AvailabilityBooking
-          slug={property.slug}
-          spans={spans}
-          initialYear={now.getFullYear()}
-          initialMonth={now.getMonth()}
-          canBook={canBook}
-          isOwner={property.isOwner}
-        />
-
-        <aside className="space-y-4">
+      <PropertyPlanner
+        slug={property.slug}
+        reservations={property.reservations}
+        initialYear={now.getFullYear()}
+        initialMonth={now.getMonth()}
+        canBook={canBook}
+        isOwner={property.isOwner}
+        canManage={property.canManage}
+        availability={
           <Card className="space-y-3 p-5">
             <div className="flex items-center justify-between gap-3">
               <h2 className="font-heading font-semibold tracking-tight">
@@ -157,17 +147,8 @@ export function PropertyView({
               </p>
             )}
           </Card>
-
-          <Card className="p-5">
-            <h2 className="font-heading font-semibold tracking-tight">
-              Who is staying
-            </h2>
-            <div className="mt-3">
-              <ReservationList reservations={property.reservations} />
-            </div>
-          </Card>
-        </aside>
-      </div>
+        }
+      />
 
       <section className="mt-10">
         <h2 className="font-heading font-semibold text-lg tracking-tight">
