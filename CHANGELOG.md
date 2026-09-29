@@ -33,6 +33,10 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Owners edit the name, address, description and how many the place sleeps, and can
   type a capacity rather than only stepping to it.
 - A settings screen per property, including whether it is taking requests at all.
+- Approve or reject a request from the request itself, and revoke a booking you already
+  approved. Only for dates that have not yet passed.
+- Picking a stay from the list marks it on the calendar and turns to the month it falls
+  in, so you can see a stay rather than read its dates.
 - A landing page, plus the Terms and Privacy pages Google asks for before it will verify sign-in.
 - Postgres and S3-compatible storage that come up with the dev server rather than after it.
 - Database migrations, applied automatically before the server starts.
@@ -56,6 +60,12 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   reads the same as arriving in the morning and leaving the night after.
 - Leaving before you arrive is caught while you pick, not after you send it.
 - Picking a single day shows as selected instead of leaving the calendar blank.
+- Your own request is visible to you the moment you send it, so you can see what dates
+  you asked for. Everyone else still sees nothing until the owner approves it.
+- Dates read as 03-Oct-2026 everywhere, and a time says which part of the day it is:
+  "03-Oct-2026, night 22:00" rather than "03/10/2026, 22:00:00".
+- On a phone, a dialog's close sits at the bottom right, within reach of a thumb,
+  rather than at the top corner of a panel that starts halfway down the screen.
 
 - Deployments no longer start against a database that was never migrated. On hosts that
   build and serve separately, the migration step was being skipped entirely.
