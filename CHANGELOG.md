@@ -16,6 +16,10 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - Per-property switches for showing who reserved and for charging at all. Amounts are in rupees.
 - Sign-in and sign-up, with an email and password or with Google, and an admin role.
 - A password field you can reveal, so you can check what you typed before submitting.
+- A dashboard. Signing in takes you there, and it lists the places you look after with
+  the turnover window and privacy setting on each.
+- Adding a property: name, address, how many it sleeps, the turnover window, whether
+  names are shown, and whether you charge at all.
 - A landing page, plus the Terms and Privacy pages Google asks for before it will verify sign-in.
 - Postgres and S3-compatible storage that come up with the dev server rather than after it.
 - Database migrations, applied automatically before the server starts.
@@ -34,6 +38,7 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   sign-in into an unexplained server error.
 
 - Buttons that are really links now announce themselves properly to a screen reader.
+- Signing in no longer leaves the header offering to sign you in.
 - A page no longer crashes when the browser autofills a form. The dark-mode shortcut
   assumed every key press carries a key; autofill does not.
 - The Prisma CLI no longer installs a release candidate a whole major version ahead of the client.

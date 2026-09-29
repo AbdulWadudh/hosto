@@ -174,6 +174,40 @@ the variable's name instead of returning an unexplained 500.
 It is **server-only**. Never import it from a client component — `src/config/index.ts` is
 the one that is safe to share.
 
+### D11 - Session reads go through a data access layer
+
+`src/lib/session.ts` is `server-only` and exports `cache()`-memoized `getSession`, plus
+`requireSession` and `redirectIfSignedIn`. Several Server Components can call it in one
+render for the price of one query.
+
+Auth checks live in **pages, not layouts**. Next's partial rendering means a layout does
+not re-run on navigation, so a layout-level check does not protect the routes beneath it.
+Layouts read the session only to render shell UI, and pass it to client components as
+props — a client component cannot import this module.
+
+Route groups: `(marketing)` is public with nav and footer, `(auth)` is the bare centred
+column, `(app)` is signed-in.
+
+The session read sits in `NavUser`, a nested Server Component inside `<Suspense>`, rather
+than an `await` at the top of the layout. That keeps `{children}` from being held behind
+the session query. It does **not** restore static generation: without PPR
+(`cacheComponents`), any `headers()` read in the tree makes the whole route dynamic, and
+every page is currently `ƒ`. Turning PPR on would make the landing and legal pages static
+again with the user menu streaming in — a deliberate decision, not something to enable in
+passing.
+
+### D12 - Base UI Select and Switch do post in a native form
+
+Verified rather than assumed: submitting the property form wrote
+`turnoverBufferMinutes: 240` from the `Select` and `showReserverIdentity: true` from the
+`Switch`, with an un-toggled switch correctly absent from the payload. No hidden inputs
+needed.
+
+They do **not** get an accessible name on their own. A `<p>` next to a control is not a
+label: the accessibility tree showed `combobox` and two bare `switch` nodes. Every one now
+takes `aria-labelledby` pointing at its row heading. Check the a11y tree, not the
+screenshot, when adding a control to a settings row.
+
 ## Changelog
 
 `CHANGELOG.md` holds the short, user-facing summary in plain language. Long form — why, what

@@ -1,12 +1,7 @@
 import { Suspense } from "react"
-import {
-  NavUser,
-  NavUserFallback,
-  SiteFooter,
-  SiteNav,
-} from "@/components/landing"
+import { NavUser, NavUserFallback, SiteNav } from "@/components/landing"
 
-export default function MarketingLayout({
+export default function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -16,8 +11,9 @@ export default function MarketingLayout({
           <NavUser />
         </Suspense>
       </SiteNav>
-      <main className="w-full max-w-full overflow-x-hidden">{children}</main>
-      <SiteFooter />
+      <main className="w-full max-w-full overflow-x-hidden pt-28 pb-20">
+        {children}
+      </main>
     </>
   )
 }

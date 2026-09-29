@@ -1,9 +1,12 @@
 import type { Metadata } from "next"
 import { AuthShell, SignInForm } from "@/components/auth"
+import { redirectIfSignedIn } from "@/lib/session"
 
 export const metadata: Metadata = { title: "Sign in" }
 
-export default function SignInPage() {
+export default async function SignInPage() {
+  await redirectIfSignedIn()
+
   return (
     <AuthShell
       title="Welcome back"

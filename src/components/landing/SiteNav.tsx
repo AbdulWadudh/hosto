@@ -3,7 +3,6 @@
 import { motion, useScroll, useTransform } from "motion/react"
 import Image from "next/image"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 
 const links = [
   { href: "#occupancy", label: "Calendar" },
@@ -11,7 +10,7 @@ const links = [
   { href: "#privacy", label: "Privacy" },
 ]
 
-export function SiteNav() {
+export function SiteNav({ children }: { children?: React.ReactNode }) {
   const { scrollY } = useScroll()
   const blur = useTransform(scrollY, [0, 120], [6, 18])
   const border = useTransform(
@@ -57,14 +56,7 @@ export function SiteNav() {
           ))}
         </div>
 
-        <Button
-          render={<Link href="/sign-in" />}
-          nativeButton={false}
-          size="sm"
-          className="ml-auto md:ml-2"
-        >
-          Sign in
-        </Button>
+        <div className="ml-auto md:ml-2">{children}</div>
       </motion.nav>
     </motion.header>
   )
