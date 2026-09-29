@@ -196,22 +196,24 @@ export function MonthCalendar({
               !day.occupied &&
               !day.inBuffer &&
               day.pending &&
-              "border-primary/40 border-dashed bg-primary/10",
+              "border-primary/50 border-dashed bg-primary/15",
             !picked &&
               !day.occupied &&
               day.isLeavingDay &&
               (day.span?.status === "PENDING"
-                ? "border-primary/40 border-dashed bg-primary/5"
+                ? "border-primary/30 border-dashed bg-primary/5"
                 : "bg-primary/35"),
             !picked &&
               !day.occupied &&
               !day.inBuffer &&
+              !day.isLeavingDay &&
               day.isPast &&
               "bg-[repeating-linear-gradient(135deg,var(--color-muted)_0_3px,transparent_3px_6px)]",
             !picked &&
               !day.occupied &&
               !day.inBuffer &&
               !day.pending &&
+              !day.isLeavingDay &&
               !day.isPast &&
               "bg-background",
             canPick && !picked && "hover:border-primary hover:bg-primary/15",

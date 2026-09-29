@@ -79,7 +79,9 @@ export function ReservationList({
                 reservation.status === "CONFIRMED" ? "default" : "secondary"
               }
             >
-              {reservationStatusLabel(reservation)}
+              {reservation.status === "PENDING"
+                ? "Waiting"
+                : reservationStatusLabel(reservation)}
             </Badge>
           </button>
         </li>
