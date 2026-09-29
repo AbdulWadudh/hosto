@@ -36,10 +36,25 @@ const labelFormat = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
 })
 
-const dayFormat = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+]
+
+const clockFormat = new Intl.DateTimeFormat("en-GB", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
 })
 
 export function monthLabel(year: number, month: number): string {
@@ -47,7 +62,29 @@ export function monthLabel(year: number, month: number): string {
 }
 
 export function dayLabel(date: Date): string {
-  return dayFormat.format(date)
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${day}-${monthNames[date.getMonth()]}-${date.getFullYear()}`
+}
+
+export function timeOfDay(date: Date): string {
+  const hour = date.getHours()
+  if (hour < 5) {
+    return "night"
+  }
+  if (hour < 12) {
+    return "morning"
+  }
+  if (hour < 17) {
+    return "afternoon"
+  }
+  if (hour < 21) {
+    return "evening"
+  }
+  return "night"
+}
+
+export function momentLabel(date: Date): string {
+  return `${dayLabel(date)}, ${timeOfDay(date)} ${clockFormat.format(date)}`
 }
 
 export function rangeHasConflict(from: Date, to: Date, spans: Span[]): boolean {
@@ -81,6 +118,13 @@ export function describeDuration(milliseconds: number): string {
     : `${dayPart} ${hours} hour${hours === 1 ? "" : "s"}`
 }
 
+export function coversDay(
+  span: { checkIn: Date; checkOut: Date },
+  day: Date
+): boolean {
+  return startOfDay(span.checkIn) <= day && day <= startOfDay(span.checkOut)
+}
+
 export function nightsBetween(from: Date, to: Date): number {
   return Math.max(0, Math.round((to.getTime() - from.getTime()) / dayMs))
 }
@@ -96,7 +140,11 @@ function overlapsDay(from: Date, to: Date, day: Date): boolean {
   return from < next && to > day
 }
 
-function occupiesNight(checkIn: Date, checkOut: Date, day: Date): boolean {
+export function occupiesNight(
+  checkIn: Date,
+  checkOut: Date,
+  day: Date
+): boolean {
   return startOfDay(checkIn) <= day && day < startOfDay(checkOut)
 }
 
