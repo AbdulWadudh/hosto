@@ -32,6 +32,15 @@ export async function createProperty(
   const pricingEnabled = form.get("pricingEnabled") === "on"
   const showReserverIdentity = form.get("showReserverIdentity") === "on"
   const nightlyPriceRaw = readText(form, "nightlyPrice")
+  const placeId = readText(form, "placeId") || null
+  const latitude = Number(form.get("latitude"))
+  const longitude = Number(form.get("longitude"))
+  const hasCoordinates =
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude) &&
+    Math.abs(latitude) <= 90 &&
+    Math.abs(longitude) <= 180 &&
+    readText(form, "latitude") !== ""
 
   if (title.length < 2) {
     return { error: "Give the place a name of at least two characters." }
@@ -73,6 +82,9 @@ export async function createProperty(
       slug,
       title,
       address,
+      latitude: hasCoordinates ? latitude : null,
+      longitude: hasCoordinates ? longitude : null,
+      placeId,
       description,
       imageUrls: [],
       maxGuests,

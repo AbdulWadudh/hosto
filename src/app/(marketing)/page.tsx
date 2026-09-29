@@ -1,3 +1,4 @@
+import { redirectIfSignedIn } from "@/lib/session"
 import {
   ClosingCta,
   FeatureBento,
@@ -7,7 +8,9 @@ import {
   TurnoverAccordion,
 } from "@/components/landing"
 
-export default function HomePage() {
+export default async function HomePage() {
+  await redirectIfSignedIn()
+
   return (
     <>
       <Hero />

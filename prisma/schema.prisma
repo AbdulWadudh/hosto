@@ -21,6 +21,9 @@ model Property {
   slug                  String        @unique
   title                 String
   address               String
+  latitude              Float?
+  longitude             Float?
+  placeId               String?
   description           String
   imageUrls             String[]
   pricingEnabled        Boolean       @default(true)
