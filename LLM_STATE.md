@@ -286,6 +286,13 @@ is tap-arrival then tap-departure. That is deliberate: making drag work on touch
 Days outside the shown month are still selectable. Disabling them meant that on the last
 day of a month exactly one day could be picked, which is how this was found.
 
+**A stay is described by nights plus real duration.** Neither "days" nor "nights" alone
+survives contact with the times. Arriving at night and leaving next morning is thirteen
+hours; arriving in the morning and leaving next night is thirty-seven. Both are one night,
+and calling either "2 days" is a brochure formula rather than the truth. The summary reads
+`1 night, 13 hours` — the night count for the calendar, the duration for what actually
+happened. Leaving earlier than arriving is caught before submit.
+
 **Occupancy means nights, not days touched.** A stay from the tenth at 15:00 to the
 fifteenth at 11:00 fills five squares, not six: the fifteenth is a departure, so it shows
 as turnover instead. The number of filled squares equals the number of nights, and the

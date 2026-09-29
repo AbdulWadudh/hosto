@@ -61,6 +61,26 @@ export function rangeHasConflict(from: Date, to: Date, spans: Span[]): boolean {
   )
 }
 
+export function atTime(date: Date, time: string): Date {
+  const [hours, minutes] = time.split(":").map(Number)
+  const copy = new Date(date)
+  copy.setHours(hours ?? 0, minutes ?? 0, 0, 0)
+  return copy
+}
+
+export function describeDuration(milliseconds: number): string {
+  const totalHours = Math.round(milliseconds / (60 * 60 * 1000))
+  if (totalHours < 24) {
+    return `${totalHours} hour${totalHours === 1 ? "" : "s"}`
+  }
+  const days = Math.floor(totalHours / 24)
+  const hours = totalHours % 24
+  const dayPart = `${days} day${days === 1 ? "" : "s"}`
+  return hours === 0
+    ? dayPart
+    : `${dayPart} ${hours} hour${hours === 1 ? "" : "s"}`
+}
+
 export function nightsBetween(from: Date, to: Date): number {
   return Math.max(0, Math.round((to.getTime() - from.getTime()) / dayMs))
 }

@@ -51,8 +51,10 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - The night you arrive and the night you leave are drawn as half days, so a stay from
   the third to the fourth reads as the one night it is rather than two whole days.
 - A range can no longer be drawn straight through nights that are already taken.
-- A stay reads as "4 days, 3 nights" rather than a night count on its own, and the
-  number of filled squares now matches the number of nights.
+- A stay says how long it really is: "1 night, 13 hours" rather than a night count that
+  ignored the times you picked. Arriving at night and leaving next morning no longer
+  reads the same as arriving in the morning and leaving the night after.
+- Leaving before you arrive is caught while you pick, not after you send it.
 - Picking a single day shows as selected instead of leaving the calendar blank.
 
 - Deployments no longer start against a database that was never migrated. On hosts that

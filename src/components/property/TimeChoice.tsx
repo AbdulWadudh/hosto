@@ -1,15 +1,21 @@
 export type Choice = { id: string; label: string; time: string }
 
+export function labelForTime(choices: readonly Choice[], time: string): string {
+  return choices.find((choice) => choice.time === time)?.label ?? time
+}
+
 export function TimeChoice({
   name,
   legend,
   choices,
-  defaultTime,
+  value,
+  onChange,
 }: {
   name: string
   legend: string
   choices: readonly Choice[]
-  defaultTime: string
+  value: string
+  onChange: (time: string) => void
 }) {
   return (
     <fieldset className="space-y-1.5">
@@ -21,7 +27,8 @@ export function TimeChoice({
               type="radio"
               name={name}
               value={choice.time}
-              defaultChecked={choice.time === defaultTime}
+              checked={choice.time === value}
+              onChange={() => onChange(choice.time)}
               className="peer sr-only"
             />
             <span className="block cursor-pointer rounded-(--radius-xl) px-2 py-1.5 text-center text-muted-foreground text-xs transition-colors hover:bg-muted peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">

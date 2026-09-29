@@ -5,22 +5,24 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useActionState, useEffect, useRef, useState } from "react"
 import { MonthCalendar, type Selection } from "@/components/calendar"
+import { labelForTime, TimeChoice } from "@/components/property/TimeChoice"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { config } from "@/config"
 import {
+  atTime,
   dayLabel,
+  describeDuration,
   nightsBetween,
   rangeHasConflict,
   type Span,
   toDateInput,
 } from "@/lib/calendar/month"
-import { TimeChoice } from "@/components/property/TimeChoice"
-import { config } from "@/config"
 import {
-  requestDates,
   type RequestDatesState,
+  requestDates,
 } from "@/lib/properties/requestDates"
 
 export function AvailabilityBooking({
@@ -114,10 +116,42 @@ export function AvailabilityBooking({
       ? nightsBetween(selection.from, selection.to)
       : 0
   const isDayVisit = nights === 0 && selection.to !== null
-  const days = nights + 1
+
+  const [arrivalTime, setArrivalTime] = useState<string>(config.booking.arrival)
+  const [departureTime, setDepartureTime] = useState<string>(
+    config.booking.departure
+  )
+
+  useEffect(() => {
+    setArrivalTime(
+      isDayVisit ? config.booking.dayVisit.arrival : config.booking.arrival
+    )
+    setDepartureTime(
+      isDayVisit ? config.booking.dayVisit.departure : config.booking.departure
+    )
+  }, [isDayVisit])
+
+  const arrivalLabel = labelForTime(
+    config.booking.arrivalChoices,
+    arrivalTime
+  ).toLowerCase()
+  const departureLabel = labelForTime(
+    config.booking.departureChoices,
+    departureTime
+  ).toLowerCase()
+
+  const start =
+    selection.from !== null ? atTime(selection.from, arrivalTime) : null
+  const end = selection.to !== null ? atTime(selection.to, departureTime) : null
+  const isBackwards = start !== null && end !== null && end <= start
+  const duration =
+    start !== null && end !== null && !isBackwards
+      ? describeDuration(end.getTime() - start.getTime())
+      : ""
+
   const stayLabel = isDayVisit
-    ? "1 day, no overnight"
-    : `${days} day${days === 1 ? "" : "s"}, ${nights} night${nights === 1 ? "" : "s"}`
+    ? `no overnight, ${duration}`
+    : `${nights} night${nights === 1 ? "" : "s"}, ${duration}`
 
   return (
     <Card className="p-5">
@@ -140,7 +174,11 @@ export function AvailabilityBooking({
           >
             <span className="text-xs">
               {selection.to
-                ? `${dayLabel(selection.from)} to ${dayLabel(selection.to)} · ${stayLabel}`
+                ? isBackwards
+                  ? `${dayLabel(selection.from)} ${arrivalLabel} to ${departureLabel} · check the times`
+                  : isDayVisit
+                    ? `${dayLabel(selection.from)} ${arrivalLabel} to ${departureLabel} · ${stayLabel}`
+                    : `${dayLabel(selection.from)} ${arrivalLabel} to ${dayLabel(selection.to)} ${departureLabel} · ${stayLabel}`
                 : `${dayLabel(selection.from)} · pick the day you leave, or click again for a day visit`}
             </span>
             <Button
@@ -150,6 +188,7 @@ export function AvailabilityBooking({
               aria-label="Clear selected dates"
               title="Clear"
               onClick={clear}
+              className="rounded-full"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={12} />
             </Button>
@@ -193,26 +232,18 @@ export function AvailabilityBooking({
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     <TimeChoice
-                      key={`arrive-${isDayVisit}`}
                       name="arrivalTime"
                       legend="Arriving"
                       choices={config.booking.arrivalChoices}
-                      defaultTime={
-                        isDayVisit
-                          ? config.booking.dayVisit.arrival
-                          : config.booking.arrival
-                      }
+                      value={arrivalTime}
+                      onChange={setArrivalTime}
                     />
                     <TimeChoice
-                      key={`leave-${isDayVisit}`}
                       name="departureTime"
                       legend="Leaving"
                       choices={config.booking.departureChoices}
-                      defaultTime={
-                        isDayVisit
-                          ? config.booking.dayVisit.departure
-                          : config.booking.departure
-                      }
+                      value={departureTime}
+                      onChange={setDepartureTime}
                     />
                   </div>
 
@@ -235,6 +266,13 @@ export function AvailabilityBooking({
                     />
                   </div>
 
+                  {isBackwards && (
+                    <p role="alert" className="text-destructive text-sm">
+                      Leaving {departureLabel} is before arriving {arrivalLabel}
+                      . Pick a later time to leave.
+                    </p>
+                  )}
+
                   {state.error && (
                     <p role="alert" className="text-destructive text-sm">
                       {state.error}
@@ -244,12 +282,16 @@ export function AvailabilityBooking({
                   <div className="flex flex-wrap gap-2">
                     <Button
                       type="submit"
-                      disabled={isPending}
+                      disabled={isPending || isBackwards}
                       className="h-10 flex-1 px-4"
                     >
                       {isPending
                         ? "Saving..."
-                        : `${isOwner ? "Block" : "Request"} ${stayLabel}`}
+                        : `${isOwner ? "Block" : "Request"} ${
+                            isDayVisit
+                              ? "a day visit"
+                              : `${nights} night${nights === 1 ? "" : "s"}`
+                          }`}
                     </Button>
                     <Button
                       type="button"
