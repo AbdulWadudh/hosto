@@ -88,11 +88,18 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   "03-Oct-2026, night" — since nobody picks a clock time, only a part of the day.
 - A stay no longer claims to be held until a date nobody chose. The turnover window is
   stated as what it is: four hours after they leave.
+- A stay is drawn as one ribbon across the days it covers, with the name written once and
+  rounded ends only where the stay really starts and finishes. It used to tint each day
+  separately and repeat the name, truncated, in every one of them. A stay that crosses a
+  week picks up on the next row. Clicking a ribbon opens the reservation, and a drag
+  still passes straight through one, so nights somebody has only asked for can still be
+  asked for again.
 - A request nobody has approved yet is amber on the calendar, not a paler green. It
   shared a colour with a booking that actually holds the nights, which is the one
   distinction an owner needs at a glance.
 - The day someone leaves is drawn as part of their stay rather than as anonymous
-  turnover, so a stay from the third to the fourth marks both days.
+  turnover, so a stay from the third to the fourth marks both days, at one weight rather
+  than two.
 - The floating range chip reads on two lines — the dates on one, the length of the stay
   on the other — instead of wrapping a single sentence into a shape.
 - A day is only closed by turnover if the turnover is still running when the earliest

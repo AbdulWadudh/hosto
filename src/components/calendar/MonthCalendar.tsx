@@ -14,6 +14,7 @@ import {
   type Span,
   startOfDay,
 } from "@/lib/calendar/month"
+import { buildWeekRibbons } from "@/lib/calendar/ribbons"
 import { cn } from "@/lib/utils"
 
 const weekdays = [
@@ -76,10 +77,21 @@ export function MonthCalendar({
     month: initialMonth,
   })
   const [today, setToday] = useState<Date | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
   const reduced = useReducedMotion()
 
   useEffect(() => {
     setToday(new Date())
+  }, [])
+
+  useEffect(() => {
+    const stop = () => setIsDragging(false)
+    window.addEventListener("pointerup", stop)
+    window.addEventListener("pointercancel", stop)
+    return () => {
+      window.removeEventListener("pointerup", stop)
+      window.removeEventListener("pointercancel", stop)
+    }
   }, [])
 
   const highlightStart = highlight
@@ -94,10 +106,13 @@ export function MonthCalendar({
     setCursor({ year: target.getFullYear(), month: target.getMonth() })
   }, [highlightStart])
 
-  const days = useMemo(
-    () => buildMonth(cursor.year, cursor.month, spans, today),
-    [cursor, spans, today]
-  )
+  const weeks = useMemo(() => {
+    const days = buildMonth(cursor.year, cursor.month, spans, today)
+    return Array.from({ length: 6 }, (_, index) => {
+      const week = days.slice(index * 7, index * 7 + 7)
+      return { week, ribbons: buildWeekRibbons(week, spans) }
+    })
+  }, [cursor, spans, today])
 
   const shift = (by: number) => {
     const next = new Date(cursor.year, cursor.month + by, 1)
@@ -113,8 +128,6 @@ export function MonthCalendar({
     }
     return date >= selection.from && date < selection.to
   }
-
-  const sameDay = (a: Date, b: Date) => a.getTime() === b.getTime()
 
   return (
     <div>
@@ -160,149 +173,134 @@ export function MonthCalendar({
         initial={reduced ? false : { opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18 }}
-        className="grid select-none grid-cols-7 gap-1"
+        className="select-none space-y-1"
       >
-        {days.map((day) => {
-          const label = describe(day)
-          const picked = inRange(day.date)
-          const isCheckout =
-            selection?.to != null &&
-            selection.to.getTime() !== selection.from?.getTime() &&
-            sameDay(day.date, selection.to)
-          const canPick = Boolean(onDayDown) && isSelectable(day)
-          const spanId = day.span?.id ?? null
-          const canInspect = Boolean(onSpanPick) && !canPick && spanId !== null
-          const highlighted = Boolean(
-            highlight && coversDay(highlight, day.date)
-          )
-          const title = `${dayLabel(day.date)} - ${label}`
-
-          const surface = cn(
-            "relative aspect-square w-full overflow-hidden rounded-(--radius-sm) border text-[0.65rem] transition-colors",
-            day.inMonth && "border-border/60",
-            !day.inMonth &&
-              (canPick
-                ? "border-border/30 opacity-70"
-                : "border-transparent opacity-35"),
-            picked && "bg-primary text-primary-foreground ring-2 ring-primary",
-            isCheckout && "ring-2 ring-primary ring-offset-1 ring-offset-card",
-            !picked && day.occupied && "bg-primary text-primary-foreground",
-            !picked &&
-              !day.occupied &&
-              !day.isLeavingDay &&
-              day.inBuffer &&
-              "bg-muted-foreground/30",
-            !picked &&
-              !day.occupied &&
-              !day.inBuffer &&
-              day.pending &&
-              "border-amber-400/60 border-dashed bg-amber-400/15",
-            !picked &&
-              !day.occupied &&
-              day.isLeavingDay &&
-              (day.span?.status === "PENDING"
-                ? "border-amber-400/35 border-dashed bg-amber-400/5"
-                : "bg-primary/35"),
-            !picked &&
-              !day.occupied &&
-              !day.inBuffer &&
-              !day.isLeavingDay &&
-              day.isPast &&
-              "bg-[repeating-linear-gradient(135deg,var(--color-muted)_0_3px,transparent_3px_6px)]",
-            !picked &&
-              !day.occupied &&
-              !day.inBuffer &&
-              !day.pending &&
-              !day.isLeavingDay &&
-              !day.isPast &&
-              "bg-background",
-            canPick && !picked && "hover:border-primary hover:bg-primary/15",
-            canInspect && "cursor-pointer hover:brightness-125",
-            highlighted &&
-              "z-10 ring-2 ring-foreground/70 ring-offset-1 ring-offset-card"
-          )
-
-          const number = (
-            <span
-              className={cn(
-                "absolute top-0.5 left-1 font-mono",
-                day.isToday && "underline underline-offset-2",
-                day.isPast && !day.occupied && !day.inBuffer && "opacity-40",
-                day.occupied || picked
-                  ? "text-primary-foreground"
-                  : isCheckout
-                    ? "text-primary"
-                    : "text-muted-foreground"
-              )}
-            >
-              {day.day}
-            </span>
-          )
-
-          const name = day.span?.label &&
-            (day.occupied || day.pending || day.isLeavingDay) && (
-              <span
-                className={cn(
-                  "absolute inset-x-0.5 bottom-0.5 truncate text-center text-[0.5rem] leading-tight",
-                  day.occupied || picked
-                    ? "text-primary-foreground/90"
-                    : "text-muted-foreground"
-                )}
-              >
-                {day.span.label}
-              </span>
-            )
-
-          if (!canPick) {
-            if (!canInspect) {
-              return (
-                <div key={day.key} title={title} className={surface}>
-                  {number}
-                  {name}
-                </div>
+        {weeks.map(({ week, ribbons }) => (
+          <div key={week[0]?.key} className="relative grid grid-cols-7 gap-1">
+            {week.map((day) => {
+              const label = describe(day)
+              const picked = inRange(day.date)
+              const canPick = Boolean(onDayDown) && isSelectable(day)
+              const taken = day.span !== null
+              const highlighted = Boolean(
+                highlight && coversDay(highlight, day.date)
               )
-            }
-            return (
-              <button
-                key={day.key}
-                type="button"
-                title={title}
-                aria-label={`${dayLabel(day.date)}, ${label}`}
-                onClick={() => spanId && onSpanPick?.(spanId)}
-                className={surface}
-              >
-                {number}
-                {name}
-              </button>
-            )
-          }
 
-          return (
-            <button
-              key={day.key}
-              type="button"
-              title={title}
-              aria-label={`${dayLabel(day.date)}, ${label}`}
-              aria-pressed={picked}
-              onPointerDown={() => onDayDown?.(day.date)}
-              onPointerEnter={() => onDayEnter?.(day.date)}
-              onClick={(event) => {
-                if (event.detail === 0) {
-                  onDayDown?.(day.date)
-                }
-              }}
-              className={surface}
-            >
-              {number}
-              {name}
-              {isCheckout && (
-                <span className="absolute right-0.5 bottom-0.5 font-mono text-[0.5rem] text-primary uppercase">
-                  out
+              const surface = cn(
+                "relative aspect-square w-full rounded-(--radius-sm) border text-[0.65rem] transition-colors",
+                day.inMonth ? "border-border/60" : "border-border/25",
+                !day.inMonth && "opacity-60",
+                picked && "border-primary bg-primary/25",
+                !picked &&
+                  taken &&
+                  (day.span?.status === "PENDING"
+                    ? "bg-amber-400/10"
+                    : "bg-primary/10"),
+                !picked && !taken && day.inBuffer && "bg-muted-foreground/25",
+                !picked &&
+                  !taken &&
+                  !day.inBuffer &&
+                  day.isPast &&
+                  "bg-[repeating-linear-gradient(135deg,var(--color-muted)_0_3px,transparent_3px_6px)]",
+                canPick &&
+                  !picked &&
+                  "hover:border-primary hover:bg-primary/15",
+                highlighted &&
+                  "z-10 ring-2 ring-foreground/70 ring-offset-1 ring-offset-card"
+              )
+
+              const number = (
+                <span
+                  className={cn(
+                    "absolute top-0.5 left-1 font-mono",
+                    day.isToday && "underline underline-offset-2",
+                    day.isPast && !taken && "opacity-40",
+                    picked ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
+                  {day.day}
                 </span>
-              )}
-            </button>
-          )
-        })}
+              )
+
+              if (!canPick) {
+                return (
+                  <div
+                    key={day.key}
+                    title={`${dayLabel(day.date)} - ${label}`}
+                    className={surface}
+                  >
+                    {number}
+                  </div>
+                )
+              }
+
+              return (
+                <button
+                  key={day.key}
+                  type="button"
+                  title={`${dayLabel(day.date)} - ${label}`}
+                  aria-label={`${dayLabel(day.date)}, ${label}`}
+                  aria-pressed={picked}
+                  onPointerDown={() => {
+                    setIsDragging(true)
+                    onDayDown?.(day.date)
+                  }}
+                  onPointerEnter={() => onDayEnter?.(day.date)}
+                  onClick={(event) => {
+                    if (event.detail === 0) {
+                      onDayDown?.(day.date)
+                    }
+                  }}
+                  className={surface}
+                >
+                  {number}
+                </button>
+              )
+            })}
+
+            <div className="pointer-events-none absolute inset-0 grid grid-cols-7 items-end gap-1">
+              {ribbons.map((ribbon) => {
+                const waiting = ribbon.span.status === "PENDING"
+                return (
+                  <button
+                    key={ribbon.key}
+                    type="button"
+                    disabled={!onSpanPick}
+                    title={ribbon.span.label ?? "Reserved"}
+                    onClick={() => onSpanPick?.(ribbon.span.id)}
+                    style={{
+                      gridColumnStart: ribbon.startColumn,
+                      gridColumnEnd: ribbon.endColumn,
+                      marginBottom: `${0.25 + ribbon.lane * 1.1}rem`,
+                    }}
+                    className={cn(
+                      "mx-0.5 flex h-4 min-w-0 items-center px-1.5 text-[0.55rem] leading-none transition-[filter]",
+                      isDragging
+                        ? "pointer-events-none"
+                        : "pointer-events-auto",
+                      onSpanPick && "cursor-pointer hover:brightness-110",
+                      waiting
+                        ? "border border-amber-400/70 border-dashed bg-amber-400/25 text-amber-100"
+                        : "bg-primary text-primary-foreground",
+                      ribbon.clippedStart
+                        ? "-ml-1 rounded-l-none"
+                        : "rounded-l-(--radius-2xl)",
+                      ribbon.clippedEnd
+                        ? "-mr-1 rounded-r-none"
+                        : "rounded-r-(--radius-2xl)"
+                    )}
+                  >
+                    <span className="truncate">
+                      {ribbon.clippedStart
+                        ? "..."
+                        : (ribbon.span.label ?? "Reserved")}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        ))}
       </motion.div>
 
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-[0.6rem] text-muted-foreground">
@@ -311,20 +309,16 @@ export function MonthCalendar({
           Free
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-primary" />
+          <span className="h-2 w-4 rounded-(--radius-2xl) bg-primary" />
           Booked
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-primary/35" />
-          Leaving
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-muted-foreground/40" />
-          Turnover
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full border border-amber-400/60 border-dashed bg-amber-400/20" />
+          <span className="h-2 w-4 rounded-(--radius-2xl) border border-amber-400/70 border-dashed bg-amber-400/25" />
           Requested
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="size-2 rounded-[3px] bg-muted-foreground/40" />
+          Turnover
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-[3px] bg-[repeating-linear-gradient(135deg,var(--color-muted-foreground)_0_2px,transparent_2px_4px)]" />
