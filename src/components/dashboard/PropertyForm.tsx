@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useActionState, useId, useState } from "react"
 import { GuestStepper } from "@/components/dashboard/GuestStepper"
+import { ImageUploader } from "@/components/dashboard/ImageUploader"
 import { PlacePicker } from "@/components/dashboard/PlacePicker"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -115,6 +116,11 @@ export function PropertyForm() {
               rows={3}
               placeholder="Two bedrooms, a wood stove, and no phone signal."
             />
+          </div>
+
+          <div className="space-y-2">
+            <p className="font-medium text-sm">Photographs</p>
+            <ImageUploader />
           </div>
         </div>
       </Section>

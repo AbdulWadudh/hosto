@@ -208,6 +208,32 @@ label: the accessibility tree showed `combobox` and two bare `switch` nodes. Eve
 takes `aria-labelledby` pointing at its row heading. Check the a11y tree, not the
 screenshot, when adding a control to a settings row.
 
+### D13 - Images go straight to RustFS with a presigned PUT
+
+`POST /api/v1/uploads` requires a session, checks the content type against a small
+allowlist, and returns a presigned PUT valid for five minutes. The key is always
+`properties/<ownerId>/<uuid><ext>`, built on the server, so a client can never choose
+where it writes. The browser then PUTs the file directly to storage; it never passes
+through the application.
+
+**The AWS SDK must have checksums disabled for S3-compatible storage.** Since v3.729 the
+default `requestChecksumCalculation` injects `x-amz-checksum-crc32` into the presigned
+URL as a placeholder, which RustFS validates against the real body and rejects. The PUT
+fails with no console error and no object written, which is a miserable thing to debug.
+`requestChecksumCalculation: "WHEN_REQUIRED"` is not optional here.
+
+The bucket needs two pieces of configuration, both applied by the `rustfs-bucket`
+bootstrap job: a policy granting anonymous `s3:GetObject` on `properties/*` so previews
+load, and a CORS rule allowing `PUT` so the browser can upload at all. CORS currently
+allows any origin, which is right for development and should be narrowed before this
+storage is exposed publicly.
+
+ReUI's file upload was considered and rejected: it is Radix-based, and this project runs
+the Base UI `base-nova` preset. Adopting it would put two primitive libraries in the
+bundle with different focus and keyboard behaviour. Reordering, the one thing it had that
+was missing, was added natively instead — pointer drag plus explicit move buttons, since a
+draggable element is not operable from a keyboard.
+
 ## Changelog
 
 `CHANGELOG.md` holds the short, user-facing summary in plain language. Long form — why, what

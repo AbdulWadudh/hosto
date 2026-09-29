@@ -1,4 +1,5 @@
 export { EmptyState } from "@/components/dashboard/EmptyState"
+export { ImageUploader } from "@/components/dashboard/ImageUploader"
 export { GuestStepper } from "@/components/dashboard/GuestStepper"
 export { PlacePicker } from "@/components/dashboard/PlacePicker"
 export {

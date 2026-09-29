@@ -23,6 +23,13 @@ if (Boolean(googleClientId) !== Boolean(googleClientSecret)) {
 }
 
 export const env = {
+  s3: {
+    endpoint: required("S3_ENDPOINT"),
+    region: required("S3_REGION"),
+    bucket: required("S3_BUCKET"),
+    accessKeyId: required("S3_ACCESS_KEY_ID"),
+    secretAccessKey: required("S3_SECRET_ACCESS_KEY"),
+  },
   databaseUrl: required("DATABASE_URL"),
   authSecret: required("BETTER_AUTH_SECRET"),
   google:

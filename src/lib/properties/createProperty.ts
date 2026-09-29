@@ -33,6 +33,11 @@ export async function createProperty(
   const showReserverIdentity = form.get("showReserverIdentity") === "on"
   const nightlyPriceRaw = readText(form, "nightlyPrice")
   const placeId = readText(form, "placeId") || null
+  const imageUrls = form
+    .getAll("imageUrls")
+    .map((value) => String(value).trim())
+    .filter((value) => value.startsWith("http"))
+    .slice(0, 12)
   const latitude = Number(form.get("latitude"))
   const longitude = Number(form.get("longitude"))
   const hasCoordinates =
@@ -86,7 +91,7 @@ export async function createProperty(
       longitude: hasCoordinates ? longitude : null,
       placeId,
       description,
-      imageUrls: [],
+      imageUrls,
       maxGuests,
       turnoverBufferMinutes,
       pricingEnabled,
