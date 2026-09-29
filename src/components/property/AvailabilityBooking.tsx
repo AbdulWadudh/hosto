@@ -151,9 +151,13 @@ export function AvailabilityBooking({
       ? describeDuration(end.getTime() - start.getTime())
       : ""
 
-  const stayLabel = isDayVisit
-    ? `No overnight · ${duration}`
-    : `${nights} night${nights === 1 ? "" : "s"} · ${duration}`
+  const nightsLabel = isDayVisit
+    ? "No overnight"
+    : `${nights} night${nights === 1 ? "" : "s"}`
+  const stayLabel = `${nightsLabel} · ${duration}`
+  const commitLabel = isDayVisit
+    ? `a day visit · ${duration}`
+    : stayLabel.toLowerCase()
 
   const chipHeadline = !selection.from
     ? ""
@@ -303,21 +307,17 @@ export function AvailabilityBooking({
                     <Button
                       type="submit"
                       disabled={isPending || isBackwards}
-                      className="h-10 flex-1 px-4"
+                      className="h-auto min-h-10 flex-1 whitespace-normal px-4 py-2"
                     >
                       {isPending
                         ? "Saving..."
-                        : `${isOwner ? "Block" : "Request"} ${
-                            isDayVisit
-                              ? "a day visit"
-                              : `${nights} night${nights === 1 ? "" : "s"}`
-                          }`}
+                        : `${isOwner ? "Block" : "Request"} ${commitLabel}`}
                     </Button>
                     <Button
                       type="button"
                       variant="ghost"
                       onClick={clear}
-                      className="h-10 px-4"
+                      className="h-auto min-h-10 px-4 py-2"
                     >
                       Clear
                     </Button>
