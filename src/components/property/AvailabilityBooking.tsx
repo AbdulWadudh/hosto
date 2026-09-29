@@ -145,9 +145,10 @@ export function AvailabilityBooking({
     selection.from !== null ? atTime(selection.from, arrivalTime) : null
   const end = selection.to !== null ? atTime(selection.to, departureTime) : null
   const isBackwards = start !== null && end !== null && end <= start
+  const days = nights + 1
   const stayLabel = isDayVisit
-    ? "No overnight"
-    : `${nights} night${nights === 1 ? "" : "s"}`
+    ? "Day visit"
+    : `${days} days · ${nights} night${nights === 1 ? "" : "s"}`
   const commitLabel = isDayVisit ? "a day visit" : stayLabel.toLowerCase()
 
   const chipHeadline = !selection.from

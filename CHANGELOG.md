@@ -91,7 +91,8 @@ Short, user-facing summary. The long form — why, what was measured, what was r
 - The button that sends a request says the same thing as the floating chip above it.
 - No clock arithmetic anywhere a stay is described. Nobody picks a time here, only a
   part of the day, so "1 night - 1 day 20 hours" was reporting a precision that was
-  never chosen. A stay is counted in nights, and its ends are named: Afternoon, Night.
+  never chosen. A stay is counted in days and nights, and its ends are named:
+  Afternoon, Night.
 - A date range reads as 08-11 Oct 2026 rather than repeating the month and year at both
   ends, which was squeezing the second date out of a list row next to its badge.
 - The day you leave is highlighted while you pick, the same as every other day in the
