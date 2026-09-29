@@ -75,6 +75,9 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   stated as what it is: four hours after they leave.
 - The day someone leaves is drawn as part of their stay rather than as anonymous
   turnover, so a stay from the third to the fourth marks both days.
+- A day is only closed by turnover if the turnover is still running when the earliest
+  arrival of that day would land. A window that ends at two in the morning was closing
+  the whole day behind it.
 - On a phone, a dialog sits flush against the bottom of the screen with its close at the
   bottom right, within reach of a thumb, instead of floating in the middle with its
   close in the far corner.

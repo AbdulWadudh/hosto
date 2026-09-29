@@ -1,3 +1,10 @@
+import { config } from "@/config"
+
+const earliestArrival = config.booking.arrivalChoices.reduce(
+  (earliest, choice) => (choice.time < earliest ? choice.time : earliest),
+  "23:59"
+)
+
 export type DayState = {
   key: string
   date: Date
@@ -89,7 +96,7 @@ export function holdsDates(span: Span): boolean {
 
 export function rangeHasConflict(from: Date, to: Date, spans: Span[]): boolean {
   const end = addDays(startOfDay(to), 1)
-  const start = startOfDay(from)
+  const start = atTime(from, earliestArrival)
   return spans.some(
     (span) =>
       holdsDates(span) && span.checkIn < end && span.blockedUntil > start
@@ -184,7 +191,8 @@ export function buildMonth(
     const inBuffer = confirmed.some(
       (span) =>
         !holdsNight(span, date) &&
-        overlapsDay(span.checkOut, span.blockedUntil, date)
+        overlapsDay(span.checkOut, span.blockedUntil, date) &&
+        span.blockedUntil > atTime(date, earliestArrival)
     )
 
     return {
