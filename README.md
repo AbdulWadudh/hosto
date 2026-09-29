@@ -65,6 +65,11 @@ Open <http://localhost:3000>.
 The bucket is created by a one-shot `rustfs-bucket` job behind the `bootstrap` Compose
 profile. It is idempotent and runs on every `services:up`.
 
+Its CORS allows any origin, which is fine for a service bound to this machine. A bucket
+reachable from anywhere else must allow only the hosts that serve the app — browsers
+`PUT` straight to storage from a presigned URL, so the bucket, not the app, is what
+decides who may upload.
+
 ## Scripts
 
 | | |
