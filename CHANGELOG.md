@@ -76,6 +76,9 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   "03-Oct-2026, night" — since nobody picks a clock time, only a part of the day.
 - A stay no longer claims to be held until a date nobody chose. The turnover window is
   stated as what it is: four hours after they leave.
+- A request nobody has approved yet is amber on the calendar, not a paler green. It
+  shared a colour with a booking that actually holds the nights, which is the one
+  distinction an owner needs at a glance.
 - The day someone leaves is drawn as part of their stay rather than as anonymous
   turnover, so a stay from the third to the fourth marks both days.
 - The floating range chip reads on two lines — the dates on one, the length of the stay

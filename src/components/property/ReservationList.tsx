@@ -78,6 +78,11 @@ export function ReservationList({
               variant={
                 reservation.status === "CONFIRMED" ? "default" : "secondary"
               }
+              className={
+                reservation.status === "PENDING"
+                  ? "border-amber-400/40 bg-amber-400/15 text-amber-200"
+                  : undefined
+              }
             >
               {reservation.status === "PENDING"
                 ? "Waiting"

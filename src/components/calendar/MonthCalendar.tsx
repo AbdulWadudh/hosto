@@ -196,12 +196,12 @@ export function MonthCalendar({
               !day.occupied &&
               !day.inBuffer &&
               day.pending &&
-              "border-primary/50 border-dashed bg-primary/15",
+              "border-amber-400/60 border-dashed bg-amber-400/15",
             !picked &&
               !day.occupied &&
               day.isLeavingDay &&
               (day.span?.status === "PENDING"
-                ? "border-primary/30 border-dashed bg-primary/5"
+                ? "border-amber-400/35 border-dashed bg-amber-400/5"
                 : "bg-primary/35"),
             !picked &&
               !day.occupied &&
@@ -323,7 +323,7 @@ export function MonthCalendar({
           Turnover
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full border border-primary/40 border-dashed bg-primary/10" />
+          <span className="size-2 rounded-full border border-amber-400/60 border-dashed bg-amber-400/20" />
           Requested
         </span>
         <span className="flex items-center gap-1.5">
