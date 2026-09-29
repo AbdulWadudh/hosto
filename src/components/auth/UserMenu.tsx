@@ -140,6 +140,22 @@ export function UserMenu({ user }: { user: SessionUser }) {
                 </Button>
               }
             />
+            {isAdmin && (
+              <PopoverClose
+                nativeButton={false}
+                render={
+                  <Button
+                    render={<Link href="/dashboard/admin" />}
+                    nativeButton={false}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <HugeiconsIcon icon={ShieldKeyIcon} size={14} />
+                    Admin
+                  </Button>
+                }
+              />
+            )}
             <Button
               type="button"
               variant="outline"
