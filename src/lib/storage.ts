@@ -14,10 +14,17 @@ const allowedTypes = new Set([
 
 export const maxUploadBytes = 8 * 1024 * 1024
 
+const endpoint = new URL(env.s3.endpoint)
+
+const isLocalHost =
+  endpoint.hostname === "localhost" ||
+  endpoint.hostname === "[::1]" ||
+  /^\d{1,3}(\.\d{1,3}){3}$/.test(endpoint.hostname)
+
 const client = new S3Client({
   region: env.s3.region,
   endpoint: env.s3.endpoint,
-  forcePathStyle: true,
+  forcePathStyle: isLocalHost,
   requestChecksumCalculation: "WHEN_REQUIRED",
   responseChecksumValidation: "WHEN_REQUIRED",
   credentials: {
@@ -31,7 +38,12 @@ export function isAllowedImageType(contentType: string): boolean {
 }
 
 export function publicUrlFor(key: string): string {
-  return `${env.s3.endpoint}/${env.s3.bucket}/${key}`
+  if (isLocalHost) {
+    return `${env.s3.endpoint}/${env.s3.bucket}/${key}`
+  }
+  const bucketHost = new URL(env.s3.endpoint)
+  bucketHost.hostname = `${env.s3.bucket}.${bucketHost.hostname}`
+  return `${bucketHost.origin}/${key}`
 }
 
 export async function createImageUpload(input: {

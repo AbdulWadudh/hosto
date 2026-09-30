@@ -70,6 +70,18 @@ reachable from anywhere else must allow only the hosts that serve the app — br
 `PUT` straight to storage from a presigned URL, so the bucket, not the app, is what
 decides who may upload.
 
+### Storage away from this machine
+
+A `localhost` or IP endpoint is addressed path-style, `endpoint/bucket/key`, because a
+machine-local host has no wildcard DNS. Any other endpoint is addressed virtual-host
+style, `bucket.endpoint/key`, which is what AWS, Tigris and R2 expect — Tigris buckets
+made after February 2025 reject path-style outright.
+
+For Tigris: `S3_ENDPOINT=https://t3.storage.dev` and leave `S3_REGION` empty, since the
+default `auto` is what it wants. The bucket also needs **public read on
+`properties/*`** and CORS allowing `PUT` from the site's own origin; photographs are
+served straight from storage rather than proxied, and uploads go browser-to-bucket.
+
 ## Scripts
 
 | | |

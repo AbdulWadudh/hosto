@@ -67,6 +67,10 @@ Short, user-facing summary. The long form — why, what was measured, what was r
   rather than single letters, Turnover rather than Turnaround, and a request drawn the
   amber way the app draws one instead of a shade of the booked colour.
 
+- Storage that is not on this machine is addressed the way the rest of the world expects,
+  `bucket.endpoint/key` rather than `endpoint/bucket/key`, so a Tigris or R2 bucket works
+  without a local flag. The region defaults to `auto` to match.
+
 ### Changed
 
 - Prettier and ESLint are gone. Biome does both jobs.

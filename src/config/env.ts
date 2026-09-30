@@ -35,7 +35,7 @@ if (Boolean(googleClientId) !== Boolean(googleClientSecret)) {
 const settings = {
   s3: {
     endpoint: required("S3_ENDPOINT"),
-    region: optional("S3_REGION") ?? "us-east-1",
+    region: optional("S3_REGION") ?? "auto",
     bucket: required("S3_BUCKET"),
     accessKeyId: required("S3_ACCESS_KEY_ID"),
     secretAccessKey: required("S3_SECRET_ACCESS_KEY"),
