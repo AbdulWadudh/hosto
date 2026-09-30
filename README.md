@@ -74,13 +74,24 @@ decides who may upload.
 
 A `localhost` or IP endpoint is addressed path-style, `endpoint/bucket/key`, because a
 machine-local host has no wildcard DNS. Any other endpoint is addressed virtual-host
-style, `bucket.endpoint/key`, which is what AWS, Tigris and R2 expect — Tigris buckets
-made after February 2025 reject path-style outright.
+style, `bucket.endpoint/key`.
 
-For Tigris: `S3_ENDPOINT=https://t3.storage.dev` and leave `S3_REGION` empty, since the
-default `auto` is what it wants. The bucket also needs **public read on
-`properties/*`** and CORS allowing `PUT` from the site's own origin; photographs are
-served straight from storage rather than proxied, and uploads go browser-to-bucket.
+That distinction is not cosmetic on Tigris. A signed request works either way — which is
+why uploads succeed with both — but **an anonymous read only works virtual-host**.
+Path-style returns `AccessDenied` on a public object, so a URL stored in the old shape
+serves a 403 from a bucket that is genuinely public. Photographs are served straight from
+storage rather than proxied, so the stored URL is the one a visitor's browser fetches.
+
+For Tigris: `S3_ENDPOINT=https://t3.storage.dev`, `S3_BUCKET` its name, and leave
+`S3_REGION` empty — the `auto` default is what it wants. Make the bucket readable once:
+
+```sh
+aws s3api --endpoint-url https://t3.storage.dev \
+  put-bucket-acl --bucket <bucket> --acl public-read
+```
+
+This is bucket-wide, so keep nothing private in that bucket. CORS must also allow `PUT`
+from the site's origin, since uploads go browser-to-bucket from a presigned URL.
 
 ## Scripts
 
