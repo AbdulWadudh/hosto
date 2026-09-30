@@ -115,6 +115,14 @@ migration by hand.**
 `prisma` and `dotenv` are runtime dependencies rather than devDependencies, because
 `start` shells out to the Prisma CLI and `prisma.config.ts` imports `dotenv`.
 
+**Migrations need a direct connection.** `migrate deploy` takes a session-scoped
+advisory lock, and a transaction pooler can hand that session's backend to somebody else
+while keeping the lock alive — every later deploy then fails with P1002 waiting on a lock
+nobody holds. Set `DIRECT_DATABASE_URL` to the non-pooled endpoint wherever `DATABASE_URL`
+points at a pooler; `prisma.config.ts` prefers it, and the app itself keeps using the
+pooler. To clear a stranded lock, connect and repeat `SELECT pg_advisory_unlock_all();`
+until `pg_locks` shows no advisory rows — you have to land on the backend holding it.
+
 **Never rename a migration directory that has already been deployed.** Prisma tracks
 applied migrations by folder name, so a rename reads as a new migration, and the second
 run of the same `CREATE TABLE` fails and blocks every deployment after it with P3009.
